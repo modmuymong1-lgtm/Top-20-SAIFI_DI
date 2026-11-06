@@ -1,0 +1,1223 @@
+<title>ติดตามแผน PM Top 20 กฟฉ.2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: PEA purple header band → office filter → summary (KPIs → progress by maintenance term) → 20-row tracking table with per-term status, expandable detail → update dialog */
+:root{
+  --p900:#2E1A54; --p700:#4B2E83; --p500:#7C5CBF; --p100:#EFE9FA;
+  --gold:#E8A33D; --green:#1E9E6B; --green-bg:#E5F7EF; --amber:#C77D12; --amber-bg:#FDF1DC;
+  --red:#D64545; --red-bg:#FCEAEA; --blue:#2F80C4; --blue-bg:#E9F3FB; --grey-bg:#F0EEF4; --grey:#6E6880;
+  --ink:#241D34; --muted:#736A85; --bg:#F5F3FA; --card:#FFFFFF; --border:#E4DFF1;
+  --track:#EFEAF9; --head-ink:#3E2069; --hover:#F1ECFB; --zebra:#FAF8FD; --bar:#7C5CBF;
+  --f-display:'Kanit','Segoe UI',Tahoma,sans-serif; --f-body:'Sarabun','Segoe UI',Tahoma,sans-serif;
+  --shadow:0 12px 30px -18px rgba(46,26,84,.35);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --p100:#2C2242; --ink:#EDE8F7; --muted:#A79DBA; --bg:#15111D; --card:#1F1A2B; --border:#352C48;
+  --track:#2C2440; --head-ink:#CDBAF5; --hover:#2A2240; --zebra:#231D31; --bar:#A58BE0;
+  --green-bg:#163A2D; --amber-bg:#3B2C12; --red-bg:#3D1E22; --blue-bg:#17293B; --grey-bg:#2A2533; --grey:#A49DB3;
+  --green:#36C08A; --red:#EF6B6B; --blue:#5AA5E6; --amber:#E9A23B;
+  --shadow:0 12px 30px -18px rgba(0,0,0,.7); color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --p100:#2C2242; --ink:#EDE8F7; --muted:#A79DBA; --bg:#15111D; --card:#1F1A2B; --border:#352C48;
+  --track:#2C2440; --head-ink:#CDBAF5; --hover:#2A2240; --zebra:#231D31; --bar:#A58BE0;
+  --green-bg:#163A2D; --amber-bg:#3B2C12; --red-bg:#3D1E22; --blue-bg:#17293B; --grey-bg:#2A2533; --grey:#A49DB3;
+  --green:#36C08A; --red:#EF6B6B; --blue:#5AA5E6; --amber:#E9A23B;
+  --shadow:0 12px 30px -18px rgba(0,0,0,.7); color-scheme:dark; }
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--f-body);background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.inner{max-width:1320px;margin:0 auto;min-width:0;width:100%}
+.header{background:linear-gradient(120deg,#2E1A54 0%,#4B2E83 60%,#6B4BB0 100%);color:#fff;padding-block:24px 28px}
+.eyebrow{font-family:var(--f-display);font-size:13px;letter-spacing:1.5px;color:#E8A33D;font-weight:600;margin-bottom:4px}
+h1{font-family:var(--f-display);font-size:clamp(20px,3vw,27px);font-weight:700;margin:0 0 4px;line-height:1.35;text-wrap:balance}
+.subtitle{font-size:14px;color:#D9CFF0;max-width:860px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.meta span{font-size:12.5px;background:rgba(255,255,255,.14);padding:3px 10px;border-radius:20px;color:#fff}
+.wrap{padding-block:18px 60px}
+.col{display:flex;flex-direction:column;gap:18px}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,tr:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.filter-bar{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.filter-bar label{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 220px}
+.filter-bar select{min-width:0;flex:1 1 140px}
+select,input,textarea{font-family:var(--f-body);font-size:14.5px;color:var(--ink);background:var(--card);border:1px solid var(--border);border-radius:9px;padding:7px 10px;max-width:100%}
+textarea{width:100%;resize:vertical;min-height:64px}
+.sync{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px;flex:1 1 100%}
+@media (min-width:900px){.sync{flex:0 1 auto;margin-left:auto}}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--amber);flex:none}
+.dot.ok{background:var(--green)} .dot.err{background:var(--red)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi .lbl{font-size:13px;color:var(--muted)}
+.kpi .val{font-family:var(--f-display);font-size:28px;font-weight:600;color:var(--head-ink);font-variant-numeric:tabular-nums;line-height:1.25}
+.kpi .val small{font-size:15px;color:var(--muted);font-weight:500}
+.kpi .sub{font-size:12.5px;color:var(--muted)}
+.meter{height:6px;background:var(--track);border-radius:4px;overflow:hidden;margin-top:6px}
+.meter i{display:block;height:100%;background:var(--green);border-radius:4px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;min-width:0;box-shadow:var(--shadow)}
+.card h2{font-family:var(--f-display);font-size:17px;font-weight:600;color:var(--head-ink);margin:0 0 2px}
+.card .hint{font-size:13px;color:var(--muted);margin:0 0 12px}
+.terms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:900px){.terms{grid-template-columns:minmax(0,1fr)}}
+.term h3{font-family:var(--f-display);font-size:15px;font-weight:600;margin:0;color:var(--head-ink)}
+.term .what{font-size:13px;color:var(--muted);margin:0 0 8px}
+.term .big{font-family:var(--f-display);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.term .big small{font-size:13px;color:var(--muted);font-weight:400}
+.stack{display:flex;height:16px;border-radius:6px;overflow:hidden;background:var(--track);margin-top:6px}
+.stack i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend b{color:var(--ink);font-variant-numeric:tabular-nums}
+.sw{width:9px;height:9px;border-radius:3px;display:inline-block}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{font-family:var(--f-display);font-weight:500;font-size:13px;color:var(--muted);text-align:left;padding:9px 10px;background:var(--zebra);border-bottom:1px solid var(--border);white-space:nowrap}
+th.grp{text-align:center;color:var(--head-ink);border-left:1px solid var(--border)}
+td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+td.bl,th.bl{border-left:1px solid var(--border)}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr.row{cursor:pointer}
+tbody tr.row:hover{background:var(--hover)}
+tr.detail > td{background:var(--zebra)}
+.devid{font-family:var(--f-display);font-weight:600;color:var(--head-ink);white-space:nowrap}
+.sm{font-size:12.5px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;font-size:12px;padding:1px 8px;border-radius:20px;background:var(--p100);color:var(--head-ink);white-space:nowrap;font-weight:500}
+.pill{display:inline-flex;align-items:center;font-size:12.5px;padding:2px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
+.s-none{background:var(--grey-bg);color:var(--grey)}
+.s-todo{background:var(--amber-bg);color:var(--amber)}
+.s-req{background:var(--blue-bg);color:var(--blue)}
+.s-work{background:var(--p100);color:var(--head-ink)}
+.s-done{background:var(--green-bg);color:var(--green)}
+.s-na{background:transparent;color:var(--muted);border:1px dashed var(--border)}
+.s-late{background:var(--red-bg);color:var(--red)}
+.tcell{min-width:150px}
+.tcell .plan{font-size:12.5px;color:var(--muted);margin-top:3px;max-width:200px}
+.over{color:var(--red);font-weight:700}
+.btn{font-family:var(--f-display);font-size:13px;font-weight:500;border:0;border-radius:9px;padding:5px 11px;cursor:pointer;background:var(--p700);color:#fff;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--head-ink);border:1px solid var(--border)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.lg{font-size:14px;padding:8px 15px}
+.empty{padding:22px;text-align:center;color:var(--muted);font-size:14px}
+.dgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:900px){.dgrid{grid-template-columns:minmax(0,1fr)}}
+.dcard{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.dcard h4{font-family:var(--f-display);font-size:14px;margin:0;color:var(--head-ink);font-weight:600;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.dcard p{margin:0;font-size:13.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.kv{font-size:12.5px;color:var(--muted)}
+.kv b{color:var(--ink);font-weight:500}
+.late{color:var(--red);font-weight:600}
+dialog{border:0;border-radius:16px;padding:0;width:min(760px,calc(100vw - 32px));max-height:calc(100vh - 40px);background:var(--card);color:var(--ink);box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
+dialog::backdrop{background:rgba(20,12,36,.55)}
+.dlg-h{background:var(--p700);color:#fff;padding:14px 18px}
+.dlg-h h3{font-family:var(--f-display);margin:0;font-size:18px;font-weight:600}
+.dlg-h div{font-size:13px;color:#E3DAF6}
+form.f{padding:14px 18px 18px;display:flex;flex-direction:column;gap:14px}
+fieldset{border:1px solid var(--border);border-radius:12px;padding:10px 12px 12px;margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px;min-width:0}
+legend{font-family:var(--f-display);font-weight:600;color:var(--head-ink);padding:0 6px;font-size:14.5px}
+legend small{font-family:var(--f-body);font-weight:400;color:var(--muted);font-size:12.5px}
+.f label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);min-width:0}
+.f .w2{grid-column:span 2} .f .w3{grid-column:1/-1}
+.f input,.f select{width:100%}
+@media (max-width:600px){fieldset{grid-template-columns:minmax(0,1fr)}.f .w2{grid-column:auto}}
+.f-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+.f-msg{font-size:13px;color:var(--red);margin-right:auto}
+.note{font-size:13px;color:var(--muted);background:var(--card);border:1px dashed var(--border);border-radius:12px;padding:10px 14px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--p900);color:#fff;padding:9px 16px;border-radius:10px;font-size:14px;z-index:20;box-shadow:var(--shadow)}
+.rgrid{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(2,minmax(0,.7fr));gap:6px 10px;align-items:center;grid-column:1/-1}
+.rgrid .h{font-size:12.5px;color:var(--muted)}
+.rgrid input{width:100%;text-align:right;font-variant-numeric:tabular-nums}
+.rgrid span.t{font-size:13.5px;color:var(--ink)}
+.paste{background:var(--p100);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.paste textarea{min-height:92px;font-size:13.5px;background:var(--card)}
+.parsed{display:flex;flex-wrap:wrap;gap:6px}
+.warn{font-size:13px;color:var(--amber)}
+.ok-t{font-size:13px;color:var(--green)}
+.thumbs{display:flex;flex-wrap:wrap;gap:6px}
+.thumbs img,.thumbs .ph{width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid var(--border);background:var(--track)}
+.thumbs .ph{display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);text-align:center}
+.thumbs a{display:block}
+.rep{border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:5px;background:var(--card);min-width:0}
+.rep .top{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.rep .top .sp{flex:1}
+.reps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:900px){.reps{grid-template-columns:minmax(0,1fr)}}
+.split{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.6fr);gap:18px}
+@media (max-width:900px){.split{grid-template-columns:minmax(0,1fr)}}
+.auto{font-size:11.5px;color:var(--muted);margin-left:4px}
+[hidden]{display:none!important}
+.offcell{min-width:210px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media (max-width:900px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font-family:var(--f-display);font-size:13px;border:1px solid var(--border);background:var(--card);color:var(--muted);padding:5px 12px;border-radius:20px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--p700);border-color:var(--p700);color:#fff}
+.month{display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;background:rgba(232,163,61,.16);border:1px solid rgba(232,163,61,.6);border-radius:12px;padding:6px 14px;margin-bottom:12px}
+.month .m-big{font-family:var(--f-display);font-size:clamp(20px,2.8vw,30px);font-weight:700;color:#F2B655;line-height:1.3}
+.month .m-sm{font-family:var(--f-display);font-size:15px;color:#F6E3C2;font-weight:500}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--card)}
+.tabs-bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;background:var(--card);border-bottom:1px solid var(--border)}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tab{font-family:var(--f-display);font-size:14.5px;font-weight:500;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;padding:12px 16px 9px;cursor:pointer;white-space:nowrap}
+.tab small{display:block;font-family:var(--f-body);font-size:12px;font-weight:400}
+.tab{text-decoration:none;display:block}
+.tab:hover{color:var(--head-ink);border-bottom-color:var(--gold)}
+h2.sec{font-family:var(--f-display);font-size:clamp(19px,2.2vw,23px);color:var(--head-ink);margin:14px 0 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;scroll-margin-top:84px}
+h2.sec span{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--p700);color:#fff;font-size:17px}
+h2.sec small{font-family:var(--f-body);font-size:13.5px;color:var(--muted);font-weight:400}
+.offl{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;max-width:300px}
+.offl .chip{font-weight:400;gap:4px;font-size:11.5px}
+.offl .chip b{font-weight:600}
+.offl .chip.me{background:var(--p700);color:#fff}
+.issues{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.issues{grid-template-columns:minmax(0,1fr)}}
+.issue{border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.issue h3{margin:0;font-family:var(--f-display);font-size:15.5px;color:var(--head-ink);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.issue p{margin:0;font-size:13.5px}
+.cbar{display:grid;grid-template-columns:minmax(0,130px) minmax(0,1fr) 92px;gap:10px;align-items:center;font-size:14px}
+.cbar .tr{position:relative;height:14px;background:var(--track);border-radius:6px}
+.cbar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--bar);border-radius:6px}
+.cbar .tr b{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink)}
+.cbar .v{text-align:right;font-variant-numeric:tabular-nums;font-size:13px}
+.cbar .v small{display:block;color:var(--muted);font-size:11.5px}
+.vbars{display:flex;align-items:flex-end;gap:3px;height:130px;border-bottom:1px solid var(--border);padding-top:6px}
+.vbars i{flex:1;background:var(--bar);border-radius:3px 3px 0 0;min-height:1px}
+.vbars i.we{background:var(--p100);outline:1px solid var(--border)}
+.vlab{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+tr.grp td{background:var(--p100);font-family:var(--f-display);color:var(--head-ink)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="header gut">
+  <div class="inner">
+    <div class="month"><span class="m-big">ประจำเดือนตุลาคม 2569</span><span class="m-sm">กฟฉ.2 · ข้อมูลรายงาน 52</span></div>
+    <h1>ติดตามการดำเนินงานบำรุงรักษาเชิงป้องกัน · Top 20 อุปกรณ์ที่กระทบ SAIFI / SAIDI</h1>
+    <div class="subtitle">เป้าหมาย 20 รายการแรก กฟส. อัปเดตสถานะการบำรุงรักษาระยะสั้น ระยะกลาง และระยะยาว พร้อมงบที่ขอ ข้อมูลที่บันทึกทุกคนเห็นร่วมกันทันที</div>
+    <div class="meta"><span>20 รายการ · <b id="mDev">18</b> อุปกรณ์ · <b id="mOff">20</b> กฟส.</span><span>ผู้ใช้ไฟได้รับผลกระทบรวม <b id="mCus">–</b> ราย</span><span>เรียงตาม Sum of AffectedCustomer</span></div>
+  </div>
+</header>
+
+<div class="tabs-bar gut">
+  <nav class="inner tabs" aria-label="ไปยังส่วน">
+    <a class="tab" href="#h-ana">1. วิเคราะห์เหตุการณ์<small>สาเหตุ · ช่วงเวลา · รายครั้ง</small></a>
+    <a class="tab" href="#h-track">2. ติดตามแผน PM Top 20<small>20 รายการ · ระยะสั้น กลาง ยาว</small></a>
+    <a class="tab" href="#h-ofc">3. บันทึกการดำเนินงาน<small>ราย กฟฟ. ใต้อุปกรณ์ป้องกัน</small></a>
+  </nav>
+</div>
+
+<main class="wrap gut">
+<div class="inner col">
+  <div class="filter-bar">
+    <label for="fOff">กฟส. <select id="fOff"><option value="">ทุก กฟส.</option></select></label>
+    <label for="fTyp">ประเภทอุปกรณ์ <select id="fTyp"><option value="">ทั้งหมด</option><option value="CB">CB</option><option value="Recloser">Recloser</option></select></label>
+    <label for="fSt" id="fStWrap">สถานะติดตาม <select id="fSt"><option value="">ทั้งหมด</option><option value="none">ยังไม่เริ่ม</option><option value="work">ระหว่างดำเนินการ</option><option value="late">เลยกำหนด</option><option value="done">ครบทุกระยะ</option></select></label>
+    <button type="button" class="btn lg" id="bOfc" disabled>+ กรอกการดำเนินงาน กฟฟ.</button>
+    <button type="button" class="btn lg ghost" id="bPatrol" disabled>+ รายงานผล Patrol</button>
+    <div class="sync"><i class="dot" id="syncDot"></i><span id="syncTxt">กำลังโหลดสถานะ…</span></div>
+  </div>
+
+
+
+
+
+
+
+<section class="col" id="page-ana" aria-labelledby="h-ana">
+  <h2 class="sec" id="h-ana"><span>1</span>วิเคราะห์เหตุการณ์ <small>สาเหตุ · ช่วงเวลา · เหตุการณ์รายครั้ง</small></h2>
+  <div class="kpis">
+    <div class="kpi"><span class="lbl">ผู้ใช้ไฟได้รับผลกระทบ (ฐาน SAIFI)</span><span class="val" id="aCus">–</span><div class="meter"><i id="aCusBar" style="width:0;background:var(--bar)"></i></div><span class="sub" id="aCusSub"></span></div>
+    <div class="kpi"><span class="lbl">CusXTime ผู้ใช้ไฟ-นาที (ฐาน SAIDI)</span><span class="val" id="aCxt">–</span><div class="meter"><i id="aCxtBar" style="width:0;background:var(--bar)"></i></div><span class="sub" id="aCxtSub"></span></div>
+    <div class="kpi"><span class="lbl">เหตุการณ์ไฟฟ้าขัดข้อง</span><span class="val" id="aEv">–</span><span class="sub" id="aEvSub"></span></div>
+    <div class="kpi"><span class="lbl">ไม่พบสาเหตุจากการตรวจ</span><span class="val" id="aUnk">–</span><span class="sub" id="aUnkSub"></span></div>
+  </div>
+  <div class="card">
+    <h2>ประเด็นที่ควรดำเนินการ</h2>
+    <p class="hint">สรุปจากเหตุการณ์ของอุปกรณ์ตามตัวกรอง</p>
+    <div class="issues" id="aIssues"></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:flex-start">
+        <div style="min-width:0"><h2>สาเหตุไฟฟ้าขัดข้อง</h2><p class="hint" id="aCauseHint"></p></div>
+        <div class="seg" id="aMode"><button type="button" data-m="0" aria-pressed="true">ครั้ง</button><button type="button" data-m="1" aria-pressed="false">ผู้ใช้ไฟ</button><button type="button" data-m="2" aria-pressed="false">CusXTime</button></div>
+      </div>
+      <div class="rows" id="aCause" style="display:flex;flex-direction:column;gap:12px"></div>
+      <div class="legend" style="margin-top:12px"><span><i class="sw" style="background:var(--bar)"></i>Top 20 ตามตัวกรอง</span><span><i class="sw" style="background:var(--ink);width:2px"></i>สัดส่วนทั้ง กฟฉ.2</span></div>
+    </div>
+    <div class="card">
+      <h2>จำนวนเหตุการณ์รายวัน · ตุลาคม 2569</h2>
+      <p class="hint">สีอ่อน = วันเสาร์-อาทิตย์</p>
+      <div class="vbars" id="aDaily"></div><div class="vlab"><span>1</span><span>8</span><span>15</span><span>22</span><span>31</span></div>
+      <h2 style="margin-top:18px">ช่วงเวลาที่เกิดเหตุ (ชั่วโมง)</h2>
+      <p class="hint" id="aHourHint"></p>
+      <div class="vbars" id="aHour"></div><div class="vlab"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <details id="aEvBox"><summary style="cursor:pointer;list-style:none"><h2 style="display:inline">เหตุการณ์รายครั้ง</h2> <span class="btn ghost" id="aEvBtn" style="margin-left:8px">แสดง / ซ่อน</span></summary>
+    <p class="hint" style="margin-top:8px">เรียงตามวันเวลาไฟดับ ใช้อ้างอิงหมายเลขเหตุการณ์ตอนรายงาน Patrol</p>
+    <div class="tbl-wrap"><table><thead><tr><th>วันเวลาไฟดับ</th><th>อุปกรณ์</th><th>หมายเลขเหตุการณ์</th><th>สถานะ</th><th class="n">นาที</th><th>สาเหตุ</th><th>สภาพอากาศ</th><th class="n">ผู้ใช้ไฟ</th><th>กฟส. ที่ได้รับผลกระทบ</th></tr></thead><tbody id="aEvTbl"></tbody></table></div>
+    </details>
+  </div>
+</section>
+
+<section class="col" id="page-track" aria-labelledby="h-track">
+  <h2 class="sec" id="h-track"><span>2</span>ติดตามแผน PM Top 20 <small>20 รายการ · ระยะสั้น กลาง ยาว</small></h2>
+
+  <div class="card">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:flex-start">
+      <div style="min-width:0"><h2>ทะเบียนติดตาม 20 รายการ</h2><p class="hint">คลิกแถวเพื่อดูรายละเอียดแต่ละระยะ กด "อัปเดต" เพื่อรายงานผล</p></div>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead>
+        <tr><th rowspan="2" class="n">#</th><th rowspan="2">อุปกรณ์</th><th rowspan="2">กฟส. / กฟฟ. ที่ได้รับผลกระทบ</th><th rowspan="2" class="n">ครั้ง</th><th rowspan="2" class="n">นาที</th><th rowspan="2" class="n">ผู้ใช้ไฟ (ราย)</th><th rowspan="2" class="n">CusXTime</th><th colspan="3" class="grp">การบำรุงรักษาเชิงป้องกัน</th><th rowspan="2" class="bl">สถานะติดตาม</th><th rowspan="2"></th></tr>
+        <tr><th class="bl">ระยะสั้น</th><th>ระยะกลาง</th><th>ระยะยาว</th></tr>
+      </thead>
+      <tbody id="tb"></tbody>
+    </table></div>
+    <p class="sm" style="margin:10px 0 0">ระยะสั้น: Patrol แก้ไขจุดเสี่ยง · ระยะกลาง: ติดตั้งอุปกรณ์ป้องกันสัตว์ · ระยะยาว: ประมาณงานเปลี่ยนอุปกรณ์ทดแทนที่เสื่อมสภาพ · ครั้งสีแดง = เกินเกณฑ์ทั้งปี (CB &lt; 9, Recloser &lt; 10 ครั้ง/ตัว/ปี) แล้วในเดือนเดียว</p>
+  </div>
+
+  <div class="filter-bar" id="sheetBar" hidden>
+    <span class="sm" style="flex:1 1 260px;min-width:0"><b style="color:var(--head-ink)">Google Sheet</b> · <a href="https://docs.google.com/spreadsheets/d/1HWt7-RT4WV2cJ4RbpYo7eLApKaF1_BXT_ZCfqZEqc8s/edit" target="_blank" rel="noopener" style="color:var(--head-ink)">กิจกรรม กลุ่ม PM ALL</a> · แท็บ "การดำเนินงานบำรุงรักษา" · เห็นเฉพาะเจ้าของหน้า · <span id="sheetTxt">ยังไม่เคยส่งออก</span></span>
+    <div id="webBox" hidden style="display:flex;gap:6px;flex:1 1 100%;flex-wrap:wrap;align-items:center">
+      <label for="webUrl" class="sm" style="flex:1 1 320px;display:flex;gap:6px;align-items:center;min-width:0">URL Google Apps Script <input id="webUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" style="flex:1;min-width:0"></label>
+      <button type="button" class="btn ghost" id="webSave">เชื่อมต่อ</button>
+    </div>
+    <button type="button" class="btn lg" id="bSheet">บันทึกลง Google Sheet</button>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><span class="lbl">ระยะสั้น · Patrol แก้ไขจุดเสี่ยง</span><span class="val" id="kS">–</span><div class="meter"><i id="kSBar" style="width:0"></i></div><span class="sub" id="kSSub"></span></div>
+    <div class="kpi"><span class="lbl">รายการที่ดำเนินการครบทุกระยะ</span><span class="val" id="kAll">–</span><span class="sub" id="kAllSub"></span></div>
+    <div class="kpi"><span class="lbl">งบประมาณที่ขอ</span><span class="val" id="kBud">–</span><span class="sub" id="kBudSub"></span></div>
+    <div class="kpi"><span class="lbl">ต้องติดตามเร่งด่วน</span><span class="val" id="kLate">–</span><span class="sub" id="kLateSub"></span></div>
+  </div>
+
+  <div class="card">
+    <h2>ความคืบหน้าตามระยะการบำรุงรักษา</h2>
+    <p class="hint">นับจากรายการตามตัวกรอง สถานะ "ไม่จำเป็น" ไม่นับเป็นงานค้าง</p>
+    <div class="terms" id="terms"></div>
+  </div>
+
+  <div class="card">
+    <h2>ผลการแก้ไขระยะสั้น · Patrol จุดเสี่ยงจาก OUTAGE_NE2</h2>
+    <p class="hint">กฟส. วางข้อความแจ้งเตือนจากไลน์กลุ่ม OUTAGE_NE2 แล้วรายงานจุดเสี่ยงที่พบและแก้ไข สถานะระยะสั้นของรายการจะติ๊กอัตโนมัติ: แก้ไขแล้วเสร็จทุกรายงาน = แล้วเสร็จ, ยังมีจุดค้าง = กำลังดำเนินการ</p>
+    <div class="split">
+      <div style="min-width:0;display:flex;flex-direction:column;gap:10px">
+        <div class="kpis" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+          <div class="kpi"><span class="lbl">รายงาน Patrol</span><span class="val" id="pN">0</span><span class="sub" id="pNSub"></span></div>
+          <div class="kpi"><span class="lbl">จุดเสี่ยงค้างแก้</span><span class="val" id="pPend">0</span><span class="sub" id="pPendSub"></span></div>
+        </div>
+        <div class="tbl-wrap"><table><thead><tr><th>ประเภทจุดเสี่ยง</th><th class="n">พบ</th><th class="n">แก้แล้ว</th><th class="n">ค้าง</th></tr></thead><tbody id="riskTbl"></tbody></table></div>
+      </div>
+      <div style="min-width:0">
+        <div class="sm" style="margin-bottom:6px">รายงานล่าสุด</div>
+        <div class="reps" id="repList"></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<section class="col" id="page-ofc" aria-labelledby="h-ofc">
+  <h2 class="sec" id="h-ofc"><span>3</span>บันทึกการดำเนินงานแผนบำรุงรักษา <small>ระยะสั้น · กลาง ราย กฟฟ. ใต้อุปกรณ์ป้องกัน</small></h2>
+  <div class="kpis">
+    <div class="kpi"><span class="lbl">กฟส. ใต้อุปกรณ์ป้องกัน</span><span class="val" id="oN">–</span><span class="sub" id="oNSub"></span></div>
+    <div class="kpi"><span class="lbl">ระยะสั้น แล้วเสร็จ</span><span class="val" id="oS">–</span><div class="meter"><i id="oSBar" style="width:0"></i></div><span class="sub" id="oSSub"></span></div>
+    <div class="kpi"><span class="lbl">ระยะกลาง มีแผนแล้ว</span><span class="val" id="oM">–</span><div class="meter"><i id="oMBar" style="width:0;background:var(--amber)"></i></div><span class="sub" id="oMSub"></span></div>
+    <div class="kpi"><span class="lbl">งบระยะกลางที่ขอ</span><span class="val" id="oBud">–</span><span class="sub" id="oBudSub"></span></div>
+  </div>
+  <div class="card">
+    <h2>บันทึกการดำเนินงานราย กฟส. ภายใต้อุปกรณ์ป้องกัน</h2>
+    <p class="hint">อุปกรณ์หนึ่งตัวจ่ายไฟหลาย กฟส. แต่ละ กฟส. กรอกผลระยะสั้น (Patrol แก้ไขจุดเสี่ยงในพื้นที่ตัวเอง) และแผนระยะกลาง (ติดตั้งอุปกรณ์ป้องกันสัตว์ / ของบ) เลือก กฟส. ที่ตัวกรองด้านบนเพื่อดูเฉพาะงานของตัวเอง</p>
+    <div class="tbl-wrap"><table><thead><tr><th>กฟส.</th><th class="n">ผู้ใช้ไฟ (ราย)</th><th class="n">CusXTime</th><th class="bl">ระยะสั้น</th><th>ระยะกลาง</th><th class="bl">อัปเดตล่าสุด</th><th></th></tr></thead><tbody id="oTbl"></tbody></table></div>
+  </div>
+</section>
+
+  <div class="note" id="srcNote"></div>
+</div>
+</main>
+
+<dialog id="dlg" aria-labelledby="dlgT">
+  <div class="dlg-h"><h3 id="dlgT">อัปเดตการดำเนินงาน</h3><div id="dlgSub"></div></div>
+  <form class="f" id="form" novalidate>
+    <div id="fsWrap" style="display:flex;flex-direction:column;gap:14px"></div>
+    <fieldset>
+      <legend>ของบจ้างเหมาตัดต้นไม้ กรณีพิเศษ</legend>
+      <label for="tStatus"><span>สถานะคำขอ</span><select id="tStatus"><option value="">ไม่ขอ</option><option value="req">เสนอขอ</option><option value="appr">อนุมัติแล้ว</option><option value="done">ดำเนินการแล้ว</option></select></label>
+      <label for="tBud"><span>วงเงิน (บาท)</span><input id="tBud" type="number" min="0" step="1000" inputmode="numeric"></label>
+      <label for="tKm"><span>ระยะทาง (วงจร-กม.)</span><input id="tKm" type="number" min="0" step="0.1" inputmode="decimal"></label>
+    </fieldset>
+    <label for="iNote"><span>หมายเหตุ / ปัญหาที่พบ</span><textarea id="iNote" placeholder="เช่น สาเหตุหลักจากงูพาดสาย ช่วงเสา 45–60 รอวัสดุ Animal guard"></textarea></label>
+    <label for="iBy"><span>ผู้รายงาน / ตำแหน่ง</span><input id="iBy" type="text" placeholder="เช่น หผ.บ. กฟส.เมืองอุบลราชธานี"></label>
+    <div class="f-actions"><span class="f-msg" id="fMsg"></span><button type="button" class="btn ghost lg" id="bCancel">ยกเลิก</button><button type="submit" class="btn lg" id="bSave">บันทึก</button></div>
+  </form>
+</dialog>
+<dialog id="pdlg" aria-labelledby="pT">
+  <div class="dlg-h"><h3 id="pT">รายงานผล Patrol แก้ไขจุดเสี่ยง (ระยะสั้น)</h3><div id="pSub">อ้างอิงข้อความแจ้งการทำงานของอุปกรณ์จาก OUTAGE_NE2</div></div>
+  <form class="f" id="pform" novalidate>
+    <div class="paste">
+      <label for="pPaste"><span style="color:var(--head-ink);font-weight:600">1. วางข้อความจากไลน์ OUTAGE_NE2</span>
+        <textarea id="pPaste" placeholder="คัดลอกข้อความ ⚡ แจ้งการทำงานของอุปกรณ์ระบบจำหน่าย ⚡ ทั้งข้อความมาวางที่นี่ ระบบจะเติมช่องด้านล่างให้"></textarea></label>
+      <div class="parsed" id="pParsed"></div>
+      <div id="pMatch"></div>
+      <label for="pPaste2"><span style="color:var(--head-ink);font-weight:600">2. วางข้อความรายงานแก้ไขจุดเสี่ยงจากไลน์กลุ่ม PM all (ถ้ามี)</span>
+        <textarea id="pPaste2" placeholder="เช่น วันที่ 5/11/69 กฟส.ลท. แก้ไขจุดเสี่ยง … -ยกสายขึ้นตั้งบนลูกถ้วย -ติดตั้ง Cover PG จุดต่อสาย 3 จุด"></textarea></label>
+      <div class="parsed" id="pParsed2"></div>
+      <div id="pMatch2"></div>
+    </div>
+    <fieldset>
+      <legend>3. ข้อมูลเหตุการณ์</legend>
+      <label class="w2" for="pRow"><span>รายการเป้าหมาย Top 20</span><select id="pRow"></select></label>
+      <label for="pEv"><span>หมายเลขเหตุการณ์</span><input id="pEv" type="text" inputmode="numeric"></label>
+      <label for="pOrd"><span>หมายเลขใบสั่ง</span><input id="pOrd" type="text" inputmode="numeric"></label>
+      <label for="pDate"><span>วันที่ไฟดับ</span><input id="pDate" type="date"></label>
+      <label for="pTime"><span>เวลา</span><input id="pTime" type="time"></label>
+      <label for="pStat"><span>สถานะอุปกรณ์</span><input id="pStat" type="text" placeholder="Trip Reclose (T/R)"></label>
+      <label for="pPh"><span>Phase Fault</span><input id="pPh" type="text"></label>
+      <label for="pCur"><span>กระแส Fault</span><input id="pCur" type="text" placeholder="A=733A"></label>
+    </fieldset>
+    <fieldset>
+      <legend>4. ผลการ Patrol และแก้ไข</legend>
+      <label for="pCause"><span>สาเหตุที่พบ</span><select id="pCause"><option>ต้นไม้ / กิ่งไม้</option><option>สัตว์ (งู นก กระรอก)</option><option>อุปกรณ์ชำรุด / เสื่อมสภาพ</option><option>ฟ้าผ่า / ลมพายุ</option><option>ยานพาหนะชน / บุคคลภายนอก</option><option>ไม่พบสาเหตุ</option><option>อื่น ๆ</option></select></label>
+      <label for="pFix"><span>วันที่แก้ไข</span><input id="pFix" type="date"></label>
+      <label for="pKm"><span>ระยะทาง Patrol (วงจร-กม.)</span><input id="pKm" type="number" min="0" step="0.1" inputmode="decimal"></label>
+      <label class="w2" for="pSpan"><span>ช่วงที่ตรวจ (ต้นทาง–ปลายทาง / หมายเลขเสา)</span><input id="pSpan" type="text" placeholder="เช่น หน้าสถานี – บ้านโนนสูง เสา 1–145"></label>
+      <label for="pCrew"><span>ชุดปฏิบัติงาน</span><input id="pCrew" type="text" placeholder="เช่น ชุดแก้ไฟ กฟส. 2 คน"></label>
+      <div class="rgrid" id="pRisks"><span class="h">จุดเสี่ยงที่พบ</span><span class="h" style="text-align:right">พบ (จุด)</span><span class="h" style="text-align:right">แก้แล้ว (จุด)</span></div>
+      <label class="w3" for="pRes"><span>รายละเอียดการแก้ไข</span><textarea id="pRes" placeholder="เช่น ตัดกิ่งไม้ 12 จุด ติดตั้ง Animal guard 4 ชุด เปลี่ยนลูกถ้วย 2 ลูก"></textarea></label>
+      <label for="pOut"><span>ผลการแก้ไข</span><select id="pOut"><option value="done">แก้ไขแล้วเสร็จ</option><option value="part">แก้ไขบางส่วน มีจุดค้าง</option><option value="budget">ต้องของบ ส่งต่อระยะกลาง/ยาว</option></select></label>
+      <label for="pSap"><span>เลขที่ SAP (ZPM2/ZPM4)</span><input id="pSap" type="text"></label>
+      <label for="pBy"><span>ผู้รายงาน / ตำแหน่ง</span><input id="pBy" type="text"></label>
+      <div class="w3" id="pPhotoWrap" style="display:flex;flex-direction:column;gap:6px">
+        <label for="pPhoto"><span>รูปก่อน / หลังแก้ไข (สูงสุด 6 รูป)</span><input id="pPhoto" type="file" accept="image/*" multiple></label>
+        <div class="thumbs" id="pThumbs"></div>
+      </div>
+    </fieldset>
+    <div class="f-actions"><span class="f-msg" id="pMsg"></span><button type="button" class="btn ghost lg" id="pCancel">ยกเลิก</button><button type="submit" class="btn lg" id="pSave">บันทึกรายงาน</button></div>
+  </form>
+</dialog>
+<dialog id="odlg" aria-labelledby="oT">
+  <div class="dlg-h"><h3 id="oT">บันทึกการดำเนินงาน กฟส.</h3><div id="oSub"></div></div>
+  <form class="f" id="oform" novalidate>
+    <label for="oPick"><span>เลือกรายการ (กฟฟ. · อุปกรณ์ป้องกัน)</span><select id="oPick"></select></label>
+    <fieldset>
+      <legend>ระยะสั้น <small>Patrol แก้ไขจุดเสี่ยงในพื้นที่ กฟส.</small></legend>
+      <label for="osSt"><span>สถานะ</span><select id="osSt"><option value="none">ยังไม่ดำเนินการ</option><option value="work">กำลังดำเนินการ</option><option value="done">แล้วเสร็จ</option></select></label>
+      <label for="osDate"><span>วันที่ดำเนินการ</span><input id="osDate" type="date"></label>
+      <label for="osKm"><span>ระยะทาง Patrol (วงจร-กม.)</span><input id="osKm" type="number" min="0" step="0.1" inputmode="decimal"></label>
+      <label for="osF"><span>จุดเสี่ยงที่พบ (จุด)</span><input id="osF" type="number" min="0" step="1" inputmode="numeric"></label>
+      <label for="osX"><span>แก้ไขแล้ว (จุด)</span><input id="osX" type="number" min="0" step="1" inputmode="numeric"></label>
+      <label for="osSap"><span>เลขที่ SAP (ZPM2/ZPM4)</span><input id="osSap" type="text"></label>
+      <label class="w3" for="osDet"><span>รายละเอียดการแก้ไข</span><textarea id="osDet" placeholder="เช่น ตัดกิ่งไม้ 8 จุด ยกสายขึ้นลูกถ้วย 2 จุด ติดตั้ง Cover PG 3 จุด"></textarea></label>
+    </fieldset>
+    <fieldset>
+      <legend>ระยะกลาง <small>ติดตั้งอุปกรณ์ป้องกันสัตว์ / ของบป้องกัน / ตัดต้นไม้กรณีพิเศษ</small></legend>
+      <label class="w2" for="omPlan"><span>แผนงาน</span><input id="omPlan" type="text" placeholder="เช่น ติดตั้ง Snake guard 24 ชุด ช่วงเสา 10-80"></label>
+      <label for="omSt"><span>สถานะ</span><select id="omSt"><option value="none">ยังไม่มีแผน</option><option value="todo">มีแผน ยังไม่ดำเนินการ</option><option value="req">เสนอของบ / รออนุมัติ</option><option value="appr">อนุมัติแล้ว</option><option value="work">กำลังดำเนินการ</option><option value="done">แล้วเสร็จ</option><option value="na">ไม่จำเป็น</option></select></label>
+      <label for="omBud"><span>งบประมาณ (บาท)</span><input id="omBud" type="number" min="0" step="1000" inputmode="numeric"></label>
+      <label for="omDue"><span>กำหนดแล้วเสร็จ</span><input id="omDue" type="date"></label>
+      <label for="omSap"><span>เลขที่ SAP / WBS</span><input id="omSap" type="text"></label>
+      <label class="w3" for="omDet"><span>รายละเอียด / ผลการดำเนินงาน</span><textarea id="omDet"></textarea></label>
+    </fieldset>
+    <label for="oBy"><span>ผู้รายงาน / ตำแหน่ง</span><input id="oBy" type="text" placeholder="เช่น หผ.บ. กฟส.ศรีเมืองใหม่"></label>
+    <div class="f-actions"><span class="f-msg" id="oMsg"></span><button type="button" class="btn ghost lg" id="oCancel">ยกเลิก</button><button type="submit" class="btn lg" id="oSave">บันทึก</button></div>
+  </form>
+</dialog>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const T20 = [{"no":1,"id":"UBV03VB-01","off":"เมืองอุบลราชธานี","fdr":"UBV03","gis":"22CBEA000008979","g":"CB","cnt":11,"dur":3,"cus":71324,"cxt":16605,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":2,"id":"PYP04VB-01","off":"ยางสีสุราช","fdr":"PYP04","gis":"22CBEA000009284","g":"CB","cnt":7,"dur":1,"cus":71165,"cxt":15960,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":3,"id":"TPP01VR-101","off":"ตระการพืชผล","fdr":"TPP01","gis":"22RCEA000013294","g":"Recloser","cnt":12,"dur":61,"cus":61681,"cxt":307239,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":4,"id":"ANA05VB-01","off":"เมืองอำนาจเจริญ","fdr":"ANA05","gis":"22CBEA000009100","g":"CB","cnt":6,"dur":42,"cus":52686,"cxt":347910,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":5,"id":"TPP01VR-101","off":"ศรีเมืองใหม่","fdr":"TPP01","gis":"22RCEA000013294","g":"Recloser","cnt":12,"dur":61,"cus":49528,"cxt":246631,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":6,"id":"SJB02VB-01","off":"เมืองศรีสะเกษ","fdr":"SJB02","gis":"22CBEA000009054","g":"CB","cnt":7,"dur":6,"cus":44581,"cxt":38451,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":7,"id":"KSW08VB-01","off":"จตุรพักตร์พิมาน","fdr":"KSW08","gis":"22CBEA000009298","g":"CB","cnt":3,"dur":0,"cus":44182,"cxt":444,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":8,"id":"TPP02R-05","off":"กุดข้าวปุ้น","fdr":"TPP02","gis":"22RCEA000012071","g":"Recloser","cnt":8,"dur":171,"cus":43994,"cxt":1128271,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":9,"id":"KLA06VB-01","off":"เมืองกาฬสินธุ์","fdr":"KLA06","gis":"22CBEA000009204","g":"CB","cnt":8,"dur":0,"cus":41563,"cxt":3042,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":10,"id":"MDB04R-01","off":"ดงหลวง","fdr":"MDB04","gis":"22RCEA000010592","g":"Recloser","cnt":6,"dur":0,"cus":40380,"cxt":10064,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":11,"id":"KLB06VB-01","off":"ดอนจาน","fdr":"KLB06","gis":"22CBEA000008972","g":"CB","cnt":8,"dur":24,"cus":40077,"cxt":13973,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":12,"id":"YTA08R-04","off":"ป่าติ้ว","fdr":"YTA08","gis":"22RCEA000015273","g":"Recloser","cnt":9,"dur":27,"cus":39014,"cxt":320775,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":13,"id":"PYP04VB-01","off":"นาเชือก","fdr":"PYP04","gis":"22CBEA000009284","g":"CB","cnt":7,"dur":1,"cus":37431,"cxt":8372,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":14,"id":"KNI01VB-01","off":"เขื่องใน","fdr":"KNI01","gis":"22CBEA000009275","g":"CB","cnt":5,"dur":4,"cus":35152,"cxt":16465,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":15,"id":"KUK09VB-01","off":"ไพรบึง","fdr":"KUK09","gis":"22CBEA000009314","g":"CB","cnt":4,"dur":46,"cus":32313,"cxt":223280,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":16,"id":"ZTA04R-01","off":"บุณฑริก","fdr":"ZTA04","gis":"22RCEA000000696","g":"Recloser","cnt":8,"dur":67,"cus":31974,"cxt":329378,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":17,"id":"KLA05VB-01","off":"กมลาไสย","fdr":"KLA05","gis":"22CBEA000009203","g":"CB","cnt":4,"dur":0,"cus":31519,"cxt":2300,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":18,"id":"SEL05VB-01","off":"เสลภูมิ","fdr":"SEL05","gis":"22CBEA000009115","g":"CB","cnt":2,"dur":0,"cus":31150,"cxt":331,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":19,"id":"DEA07VB-01","off":"ทุ่งศรีอุดม","fdr":"DEA07","gis":"22CBEA000009328","g":"CB","cnt":3,"dur":0,"cus":30803,"cxt":2888,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""},{"no":20,"id":"MKA07R-01","off":"เมืองมหาสารคาม","fdr":"MKA07","gis":"2244RC000000029","g":"Recloser","cnt":10,"dur":0,"cus":30618,"cxt":2520,"s":"Patrol แก้ไขจุดเสี่ยง","sd":false,"m":"","md":false,"l":"","ld":false,"note":""}];
+const EVD = {"devs":{"ANA05VB-01":{"typ":"Circuit Breaker_MV","offs":[["เมืองอำนาจเจริญ","E08101",52686,347910],["หัวตะพาน","E08107",2146,16967]],"ev":[{"n":"7016117150","t":"2026-10-03 05:49","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศชื้น / หมอก","c":"วัสดุแปลกปลอม","sc":"ว่าว/โคมลอย/ลูกโป่ง/บั้งไฟ","fd":"","dp":"PIC","det":"","wo":"","cus":11695,"cxt":3047,"by":[["เมืองอำนาจเจริญ",11208],["หัวตะพาน",487]]},{"n":"7018020026","t":"2026-10-04 16:11","dur":8,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"ฝนตก ฟ้าคะนอง","c":"ภัยธรรมชาติ","sc":"พายุโซนร้อน/ใต้ฝุ่น","fd":"","dp":"PIC","det":"","wo":"","cus":11693,"cxt":91658,"by":[["เมืองอำนาจเจริญ",11208],["หัวตะพาน",485]]},{"n":"7030847040","t":"2026-10-13 23:07","dur":13,"st":"T/L","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":1587,"cxt":21217,"by":[["เมืองอำนาจเจริญ",1383],["หัวตะพาน",204]]},{"n":"7042447251","t":"2026-10-22 08:02","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"ฝนตก ลมแรง","c":"ภัยธรรมชาติ","sc":"พายุฤดูร้อน/พายุดีเปรสชั่น","fd":"","dp":"OHGW","det":"","wo":"1009085877","cus":6436,"cxt":60,"by":[["เมืองอำนาจเจริญ",6436]]},{"n":"7045775981","t":"2026-10-25 22:12","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"ฝนตก","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"PIC","det":"","wo":"1009090467","cus":11714,"cxt":3048,"by":[["เมืองอำนาจเจริญ",11229],["หัวตะพาน",485]]},{"n":"7052191193","t":"2026-10-30 09:09","dur":21,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"ลมแรง","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"PIC","det":"","wo":"1009096971","cus":11707,"cxt":245847,"by":[["เมืองอำนาจเจริญ",11222],["หัวตะพาน",485]]}]},"DEA07VB-01":{"typ":"Circuit Breaker_MV","offs":[["ทุ่งศรีอุดม","E12108",30803,2888],["เดชอุดม","E12101",19182,25730],["นาเยีย","E12109",5619,36242],["วารินชำราบ","E13101",3565,31205],["น้ำขุ่น","E12203",1100,104]],"ev":[{"n":"7016026806","t":"2026-10-03 00:01","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"ลมแรง","c":"ต้นไม้","sc":"ลมพัดต้นไม้มาแตะสาย","fd":"","dp":"PIC","det":"","wo":"","cus":19425,"cxt":5079,"by":[["ทุ่งศรีอุดม",10265],["เดชอุดม",6371],["นาเยีย",1530],["วารินชำราบ",892],["น้ำขุ่น",367]]},{"n":"7022859373","t":"2026-10-07 15:12","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"PIC","det":"","wo":"","cus":19407,"cxt":193,"by":[["ทุ่งศรีอุดม",10256],["เดชอุดม",6368],["นาเยีย",1526],["วารินชำราบ",891],["น้ำขุ่น",366]]},{"n":"7024909406","t":"2026-10-09 08:09","dur":35,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศชื้น / หมอก","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":2614,"cxt":90710,"by":[["นาเยีย",1032],["วารินชำราบ",892],["เดชอุดม",690]]},{"n":"7030454133","t":"2026-10-13 13:26","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศชื้น / หมอก","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":18823,"cxt":187,"by":[["ทุ่งศรีอุดม",10282],["เดชอุดม",5753],["นาเยีย",1531],["วารินชำราบ",890],["น้ำขุ่น",367]]}]},"KLA05VB-01":{"typ":"Circuit Breaker_MV","offs":[["กมลาไสย","E05104",31519,2300],["เมืองกาฬสินธุ์","E05101",5382,393],["จังหาร","E06111",147,10]],"ev":[{"n":"7020396352","t":"2026-10-05 18:42","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"ฝนตก ลมแรง","c":"ภัยธรรมชาติ","sc":"พายุฤดูร้อน/พายุดีเปรสชั่น","fd":"","dp":"PIC","det":"","wo":"","cus":9261,"cxt":93,"by":[["กมลาไสย",7880],["เมืองกาฬสินธุ์",1345],["จังหาร",36]]},{"n":"7029824047","t":"2026-10-12 17:47","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"OHGW","det":"","wo":"","cus":9269,"cxt":96,"by":[["กมลาไสย",7886],["เมืองกาฬสินธุ์",1346],["จังหาร",37]]},{"n":"7030124233","t":"2026-10-13 05:54","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"คอนคอนกรีต","det":"","wo":"","cus":9268,"cxt":92,"by":[["กมลาไสย",7885],["เมืองกาฬสินธุ์",1346],["จังหาร",37]]},{"n":"7044722712","t":"2026-10-24 16:57","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"PIC","det":"","wo":"1009089059","cus":9250,"cxt":2422,"by":[["กมลาไสย",7868],["เมืองกาฬสินธุ์",1345],["จังหาร",37]]}]},"KLA06VB-01":{"typ":"Circuit Breaker_MV","offs":[["เมืองกาฬสินธุ์","E05101",41563,3042]],"ev":[{"n":"7015718222","t":"2026-10-02 17:53","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"ลมแรง","c":"วัสดุแปลกปลอม","sc":"ว่าว/โคมลอย/ลูกโป่ง/บั้งไฟ","fd":"","dp":"Fuse link","det":"","wo":"","cus":5184,"cxt":54,"by":[["เมืองกาฬสินธุ์",5184]]},{"n":"7026792067","t":"2026-10-10 15:13","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"ฝนตก ลมแรง","c":"ภัยธรรมชาติ","sc":"พายุฤดูร้อน/พายุดีเปรสชั่น","fd":"","dp":"PIC","det":"","wo":"","cus":5199,"cxt":1361,"by":[["เมืองกาฬสินธุ์",5199]]},{"n":"7027259670","t":"2026-10-11 02:22","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"ลมแรง","c":"สัตว์","sc":"งู","fd":"","dp":"Fuse link","det":"","wo":"","cus":5199,"cxt":1362,"by":[["เมืองกาฬสินธุ์",5199]]},{"n":"7038888604","t":"2026-10-19 21:04","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"1009082620","cus":5197,"cxt":53,"by":[["เมืองกาฬสินธุ์",5197]]},{"n":"7040827680","t":"2026-10-21 10:10","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"1009084589","cus":5196,"cxt":53,"by":[["เมืองกาฬสินธุ์",5196]]},{"n":"7042360610","t":"2026-10-22 06:42","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"PIC","det":"","wo":"","cus":5196,"cxt":53,"by":[["เมืองกาฬสินธุ์",5196]]},{"n":"7043820037","t":"2026-10-23 14:20","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"PIC","det":"","wo":"","cus":5196,"cxt":53,"by":[["เมืองกาฬสินธุ์",5196]]},{"n":"7045632573","t":"2026-10-25 18:06","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":5196,"cxt":53,"by":[["เมืองกาฬสินธุ์",5196]]}]},"KLB06VB-01":{"typ":"Circuit Breaker_MV","offs":[["ดอนจาน","E05102",40077,13973],["เมืองกาฬสินธุ์","E05101",13364,22372],["โพธิ์ชัย","E09203",0,0]],"ev":[{"n":"7019303264","t":"2026-10-05 10:22","dur":7,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":927,"cxt":6399,"by":[["เมืองกาฬสินธุ์",911],["ดอนจาน",16]]},{"n":"7027391605","t":"2026-10-11 07:39","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศชื้น / หมอก","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"Fuse link","det":"","wo":"","cus":8767,"cxt":74,"by":[["ดอนจาน",6682],["เมืองกาฬสินธุ์",2085]]},{"n":"7030322595","t":"2026-10-13 10:05","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":8761,"cxt":73,"by":[["ดอนจาน",6682],["เมืองกาฬสินธุ์",2079]]},{"n":"7035654051","t":"2026-10-16 22:14","dur":15,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"กระบอกฟิวส์","det":"","wo":"","cus":928,"cxt":13920,"by":[["เมืองกาฬสินธุ์",911],["ดอนจาน",17]]},{"n":"7035683460","t":"2026-10-16 23:23","dur":2,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"กระรอก/กระแต/หนู","fd":"","dp":"PIC","det":"","wo":"","cus":7830,"cxt":15660,"by":[["ดอนจาน",6664],["เมืองกาฬสินธุ์",1166]]},{"n":"7036868229","t":"2026-10-18 06:52","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"PIC","det":"","wo":"","cus":8754,"cxt":73,"by":[["ดอนจาน",6679],["เมืองกาฬสินธุ์",2075]]},{"n":"7042951970","t":"2026-10-22 13:59","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"บุชชิ่งแรงต่ำ","det":"","wo":"","cus":8743,"cxt":73,"by":[["ดอนจาน",6673],["เมืองกาฬสินธุ์",2070]]},{"n":"7044295897","t":"2026-10-24 08:44","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"Fuse link","det":"","wo":"","cus":8731,"cxt":73,"by":[["ดอนจาน",6664],["เมืองกาฬสินธุ์",2067]]}]},"KNI01VB-01":{"typ":"Circuit Breaker_MV","offs":[["เขื่องใน","E01601",35152,16465],["กันทรารมย์","E15101",0,0],["ค้อวัง","E03302",0,0]],"ev":[{"n":"7014143036","t":"2026-10-01 12:18","dur":2,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศชื้น / หมอก","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"ลูกถ้วย","det":"","wo":"","cus":1390,"cxt":2423,"by":[["เขื่องใน",1390]]},{"n":"7023357159","t":"2026-10-08 07:05","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศชื้น / หมอก","c":"สัตว์","sc":"กระรอก/กระแต/หนู","fd":"","dp":"PIC","det":"","wo":"","cus":11212,"cxt":42,"by":[["เขื่องใน",11212]]},{"n":"7031407158","t":"2026-10-14 09:09","dur":0,"st":"TR1","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":11287,"cxt":25,"by":[["เขื่องใน",11287]]},{"n":"7040326835","t":"2026-10-20 19:45","dur":2,"st":"T/L","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"ฟิวส์","det":"","wo":"","cus":6390,"cxt":12780,"by":[["เขื่องใน",6390]]},{"n":"7040427180","t":"2026-10-20 21:21","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"OHGW","det":"","wo":"","cus":4873,"cxt":1195,"by":[["เขื่องใน",4873]]}]},"KSW08VB-01":{"typ":"Circuit Breaker_MV","offs":[["จตุรพักตรพิมาน","E06102",44182,444],["เกษตรวิสัย","E06301",7589,75]],"ev":[{"n":"7014872931","t":"2026-10-02 06:09","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"ฝนตก ลมแรง","c":"ภัยธรรมชาติ","sc":"พายุฤดูร้อน/พายุดีเปรสชั่น","fd":"","dp":"OHGW","det":"","wo":"","cus":17260,"cxt":173,"by":[["จตุรพักตรพิมาน",14730],["เกษตรวิสัย",2530]]},{"n":"7016114278","t":"2026-10-03 05:45","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศชื้น / หมอก","c":"สัตว์","sc":"กระรอก/กระแต/หนู","fd":"","dp":"Fuse link","det":"","wo":"","cus":17256,"cxt":173,"by":[["จตุรพักตรพิมาน",14726],["เกษตรวิสัย",2530]]},{"n":"7022202840","t":"2026-10-07 06:34","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศชื้น / หมอก","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"PIC","det":"","wo":"","cus":17255,"cxt":173,"by":[["จตุรพักตรพิมาน",14726],["เกษตรวิสัย",2529]]}]},"KUK09VB-01":{"typ":"Circuit Breaker_MV","offs":[["ไพรบึง","E11202",32313,223280],["ขุขันธ์","E02301",4671,23277],["ขุนหาญ","E11201",3639,25033],["ศรีรัตนะ","E11103",66,9]],"ev":[{"n":"7039895674","t":"2026-10-20 15:23","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"PIC","det":"","wo":"","cus":15878,"cxt":151,"by":[["ไพรบึง",13133],["ขุขันธ์",1498],["ขุนหาญ",1214],["ศรีรัตนะ",33]]},{"n":"7040280203","t":"2026-10-20 19:20","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":1624,"cxt":15,"by":[["ไพรบึง",1404],["ขุขันธ์",220]]},{"n":"7046058791","t":"2026-10-26 06:23","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"OHGW","det":"","wo":"","cus":15847,"cxt":4132,"by":[["ไพรบึง",13110],["ขุขันธ์",1491],["ขุนหาญ",1213],["ศรีรัตนะ",33]]},{"n":"7053009841","t":"2026-10-30 19:12","dur":98,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":7340,"cxt":267301,"by":[["ไพรบึง",4666],["ขุขันธ์",1462],["ขุนหาญ",1212]]}]},"MDB04R-01":{"typ":"Recloser","offs":[["ดงหลวง","E07203",40380,10064],["กกตูม","E07204",7195,1795],["เมืองมุกดาหาร","E07101",3990,939]],"ev":[{"n":"7018866998","t":"2026-10-05 01:51","dur":36,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ภัยธรรมชาติ","sc":"พายุโซนร้อน/ใต้ฝุ่น","fd":"","dp":"OHGW","det":"","wo":"","cus":9067,"cxt":6041,"by":[["ดงหลวง",7209],["กกตูม",1195],["เมืองมุกดาหาร",663]]},{"n":"7020975899","t":"2026-10-06 08:07","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"ฝนตก ลมแรง","c":"ภัยธรรมชาติ","sc":"พายุฤดูร้อน/พายุดีเปรสชั่น","fd":"","dp":"PIC","det":"","wo":"","cus":9067,"cxt":754,"by":[["ดงหลวง",7209],["กกตูม",1195],["เมืองมุกดาหาร",663]]},{"n":"7030125405","t":"2026-10-13 05:58","dur":89,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":9111,"cxt":3790,"by":[["ดงหลวง",7243],["กกตูม",1202],["เมืองมุกดาหาร",666]]},{"n":"7037634928","t":"2026-10-19 00:36","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"ลมแรง","c":"วัสดุแปลกปลอม","sc":"ว่าว/โคมลอย/ลูกโป่ง/บั้งไฟ","fd":"","dp":"PIC","det":"","wo":"","cus":9109,"cxt":758,"by":[["ดงหลวง",7242],["กกตูม",1201],["เมืองมุกดาหาร",666]]},{"n":"7038279104","t":"2026-10-19 15:29","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"ต้นไม้","sc":"กิ่งไม้หักพาดสาย","fd":"","dp":"ตัวเปลี่ยนแทป","det":"","wo":"","cus":9109,"cxt":758,"by":[["ดงหลวง",7242],["กกตูม",1201],["เมืองมุกดาหาร",666]]},{"n":"7044218640","t":"2026-10-24 06:58","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"Fuse link","det":"","wo":"1009088229","cus":6102,"cxt":697,"by":[["ดงหลวง",4235],["กกตูม",1201],["เมืองมุกดาหาร",666]]}]},"MKA07R-01":{"typ":"Recloser","offs":[["เมืองมหาสารคาม","E04101",30618,2520],["กันทรวิชัย","E16101",9225,760]],"ev":[{"n":"7013838563","t":"2026-10-01 10:37","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศชื้น / หมอก","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":3986,"cxt":328,"by":[["เมืองมหาสารคาม",3064],["กันทรวิชัย",922]]},{"n":"7022247623","t":"2026-10-07 06:56","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"PIC","det":"","wo":"","cus":3980,"cxt":328,"by":[["เมืองมหาสารคาม",3061],["กันทรวิชัย",919]]},{"n":"7023154388","t":"2026-10-07 21:16","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"ลมแรง","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"กระบอกฟิวส์","det":"","wo":"","cus":3980,"cxt":328,"by":[["เมืองมหาสารคาม",3061],["กันทรวิชัย",919]]},{"n":"7026285580","t":"2026-10-09 23:16","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"กระรอก/กระแต/หนู","fd":"รีโคลสเซอร์","dp":"ชุด Relay","det":"","wo":"","cus":3993,"cxt":329,"by":[["เมืองมหาสารคาม",3068],["กันทรวิชัย",925]]},{"n":"7026513625","t":"2026-10-10 08:44","dur":0,"st":"TR1","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":3991,"cxt":328,"by":[["เมืองมหาสารคาม",3066],["กันทรวิชัย",925]]},{"n":"7027269991","t":"2026-10-11 03:11","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"ลมแรง","c":"สัตว์","sc":"งู","fd":"","dp":"Fuse link","det":"","wo":"","cus":3991,"cxt":328,"by":[["เมืองมหาสารคาม",3066],["กันทรวิชัย",925]]},{"n":"7033293579","t":"2026-10-15 00:47","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"รีโคลสเซอร์","dp":"ชุด Relay","det":"","wo":"","cus":3988,"cxt":328,"by":[["เมืองมหาสารคาม",3064],["กันทรวิชัย",924]]},{"n":"7042558831","t":"2026-10-22 09:28","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"OHGW","det":"","wo":"1009086063","cus":3983,"cxt":328,"by":[["เมืองมหาสารคาม",3059],["กันทรวิชัย",924]]},{"n":"7047331991","t":"2026-10-26 19:12","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"ต้นไม้","sc":"ลมพัดต้นไม้มาแตะสาย","fd":"","dp":"Fuse link","det":"","wo":"1009092016","cus":3976,"cxt":328,"by":[["เมืองมหาสารคาม",3055],["กันทรวิชัย",921]]},{"n":"7048909569","t":"2026-10-27 20:27","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"OHGW","det":"","wo":"1009093753","cus":3975,"cxt":327,"by":[["เมืองมหาสารคาม",3054],["กันทรวิชัย",921]]}]},"PYP04VB-01":{"typ":"Circuit Breaker_MV","offs":[["ยางสีสุราช","E04203",71165,15960],["นาเชือก","E04202",37431,8372],["พยัคฆภูมิพิสัย","E04201",19398,4326],["นาดูน","E04307",1982,442]],"ev":[{"n":"7016927250","t":"2026-10-03 16:37","dur":1,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"PIC","det":"","wo":"","cus":18583,"cxt":18583,"by":[["ยางสีสุราช",10194],["นาเชือก",5344],["พยัคฆภูมิพิสัย",2762],["นาดูน",283]]},{"n":"7020030348","t":"2026-10-05 16:45","dur":10,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"PIC","det":"","wo":"","cus":18562,"cxt":9744,"by":[["ยางสีสุราช",10177],["นาเชือก",5341],["พยัคฆภูมิพิสัย",2761],["นาดูน",283]]},{"n":"7027361777","t":"2026-10-11 07:02","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศชื้น / หมอก","c":"สัตว์","sc":"กระรอก/กระแต/หนู","fd":"","dp":"Fuse link","det":"","wo":"","cus":18596,"cxt":155,"by":[["ยางสีสุราช",10180],["นาเชือก",5353],["พยัคฆภูมิพิสัย",2779],["นาดูน",284]]},{"n":"7034809266","t":"2026-10-16 09:15","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"กระบอกฟิวส์","det":"","wo":"","cus":18582,"cxt":155,"by":[["ยางสีสุราช",10169],["นาเชือก",5352],["พยัคฆภูมิพิสัย",2778],["นาดูน",283]]},{"n":"7035763454","t":"2026-10-17 01:22","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":18575,"cxt":155,"by":[["ยางสีสุราช",10164],["นาเชือก",5350],["พยัคฆภูมิพิสัย",2778],["นาดูน",283]]},{"n":"7042355569","t":"2026-10-22 06:35","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"PIC","det":"","wo":"","cus":18553,"cxt":155,"by":[["ยางสีสุราช",10151],["นาเชือก",5346],["พยัคฆภูมิพิสัย",2773],["นาดูน",283]]},{"n":"7050693131","t":"2026-10-29 05:17","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"บุชชิ่ง","det":"","wo":"1009095518","cus":18525,"cxt":153,"by":[["ยางสีสุราช",10130],["นาเชือก",5345],["พยัคฆภูมิพิสัย",2767],["นาดูน",283]]}]},"SEL05VB-01":{"typ":"Circuit Breaker_MV","offs":[["เสลภูมิ","E09101",31150,331],["หนองพอก","E09204",5018,53],["โพนทอง","E09201",0,0]],"ev":[{"n":"7053464374","t":"2026-10-31 07:52","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"PIC","det":"","wo":"","cus":18085,"cxt":190,"by":[["เสลภูมิ",15575],["หนองพอก",2510]]},{"n":"7053576953","t":"2026-10-31 10:23","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"กระบอกฟิวส์","det":"","wo":"","cus":18083,"cxt":194,"by":[["เสลภูมิ",15575],["หนองพอก",2508]]}]},"SJB02VB-01":{"typ":"Circuit Breaker_MV","offs":[["เมืองศรีสะเกษ","E02101",44581,38451]],"ev":[{"n":"7015124476","t":"2026-10-02 09:59","dur":2,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ต้นไม้","sc":"กิ่งไม้หักพาดสาย","fd":"","dp":"PIC","det":"","wo":"","cus":6359,"cxt":12718,"by":[["เมืองศรีสะเกษ",6359]]},{"n":"7015442863","t":"2026-10-02 14:09","dur":2,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"ฝนตก","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":6359,"cxt":12718,"by":[["เมืองศรีสะเกษ",6359]]},{"n":"7017386842","t":"2026-10-04 07:19","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"ฝนตก","c":"ภัยธรรมชาติ","sc":"พายุฤดูร้อน/พายุดีเปรสชั่น","fd":"","dp":"PIC","det":"","wo":"","cus":6358,"cxt":64,"by":[["เมืองศรีสะเกษ",6358]]},{"n":"7026757906","t":"2026-10-10 14:25","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"ฝนตก ลมแรง","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"สายขาดไลน์แยก ภายในโรงพยาบาลศรีสะเกษ","wo":"","cus":6380,"cxt":64,"by":[["เมืองศรีสะเกษ",6380]]},{"n":"7031069242","t":"2026-10-14 05:56","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศชื้น / หมอก","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"PIC","det":"","wo":"","cus":6380,"cxt":65,"by":[["เมืองศรีสะเกษ",6380]]},{"n":"7035025555","t":"2026-10-16 12:14","dur":2,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"ไม่ทราบ","det":"","wo":"","cus":6379,"cxt":12758,"by":[["เมืองศรีสะเกษ",6379]]},{"n":"7049665443","t":"2026-10-28 12:00","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":6366,"cxt":64,"by":[["เมืองศรีสะเกษ",6366]]}]},"TPP01VR-101":{"typ":"Recloser","offs":[["ตระการพืชผล","E14101",61681,307239],["ศรีเมืองใหม่","E14102",49528,246631]],"ev":[{"n":"7024996533","t":"2026-10-09 09:49","dur":44,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศชื้น / หมอก","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":9273,"cxt":403584,"by":[["ตระการพืชผล",5144],["ศรีเมืองใหม่",4129]]},{"n":"7027790493","t":"2026-10-11 14:12","dur":17,"st":"T/L","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":9272,"cxt":120071,"by":[["ตระการพืชผล",5143],["ศรีเมืองใหม่",4129]]},{"n":"7028174067","t":"2026-10-12 06:35","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"เปลือย","det":"","wo":"","cus":9272,"cxt":777,"by":[["ตระการพืชผล",5143],["ศรีเมืองใหม่",4129]]},{"n":"7028366673","t":"2026-10-12 09:53","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"เปลือย","det":"","wo":"","cus":9272,"cxt":777,"by":[["ตระการพืชผล",5143],["ศรีเมืองใหม่",4129]]},{"n":"7028381186","t":"2026-10-12 10:05","dur":17,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"เปลือย","det":"","wo":"","cus":9272,"cxt":7754,"by":[["ตระการพืชผล",5143],["ศรีเมืองใหม่",4129]]},{"n":"7028647309","t":"2026-10-12 10:40","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"เปลือย","det":"","wo":"","cus":9272,"cxt":776,"by":[["ตระการพืชผล",5143],["ศรีเมืองใหม่",4129]]},{"n":"7028658526","t":"2026-10-12 10:50","dur":15,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":9272,"cxt":4652,"by":[["ตระการพืชผล",5143],["ศรีเมืองใหม่",4129]]},{"n":"7029159371","t":"2026-10-12 11:12","dur":1,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"ใบมีด","det":"","wo":"","cus":9272,"cxt":12373,"by":[["ตระการพืชผล",5143],["ศรีเมืองใหม่",4129]]},{"n":"7037707797","t":"2026-10-19 06:38","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศชื้น / หมอก","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"กระบอกฟิวส์","det":"","wo":"","cus":9259,"cxt":776,"by":[["ตระการพืชผล",5135],["ศรีเมืองใหม่",4124]]},{"n":"7038254474","t":"2026-10-19 15:10","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"บุชชิ่ง","det":"","wo":"","cus":9259,"cxt":777,"by":[["ตระการพืชผล",5135],["ศรีเมืองใหม่",4124]]},{"n":"7045753242","t":"2026-10-25 21:38","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"OHGW","det":"","wo":"","cus":9259,"cxt":777,"by":[["ตระการพืชผล",5135],["ศรีเมืองใหม่",4124]]},{"n":"7049101194","t":"2026-10-28 03:40","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"OHGW","det":"","wo":"","cus":9255,"cxt":776,"by":[["ตระการพืชผล",5131],["ศรีเมืองใหม่",4124]]}]},"TPP02R-05":{"typ":"Recloser","offs":[["กุดข้าวปุ้น","E14104",43994,1128271],["ตระการพืชผล","E14101",7905,188979],["ปทุมราชวงศา","E08111",0,0]],"ev":[{"n":"7018884953","t":"2026-10-05 02:42","dur":126,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"ฝนตก ลมแรง","c":"ภัยธรรมชาติ","sc":"พายุโซนร้อน/ใต้ฝุ่น","fd":"","dp":"บุชชิ่ง","det":"","wo":"","cus":9113,"cxt":1143872,"by":[["กุดข้าวปุ้น",7983],["ตระการพืชผล",1130]]},{"n":"7033515002","t":"2026-10-15 09:45","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"เปลือย","det":"","wo":"","cus":5991,"cxt":493,"by":[["กุดข้าวปุ้น",5991]]},{"n":"7034394239","t":"2026-10-15 19:12","dur":8,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":3140,"cxt":21602,"by":[["กุดข้าวปุ้น",2010],["ตระการพืชผล",1130]]},{"n":"7034911699","t":"2026-10-16 10:32","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"ต้นไม้","sc":"ลมพัดต้นไม้มาแตะสาย","fd":"","dp":"OHGW","det":"","wo":"","cus":9129,"cxt":752,"by":[["กุดข้าวปุ้น",7999],["ตระการพืชผล",1130]]},{"n":"7045763252","t":"2026-10-25 21:51","dur":11,"st":"T/L","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"ภัยธรรมชาติ","sc":"พายุโซนร้อน/ใต้ฝุ่น","fd":"","dp":"OHGW","det":"","wo":"","cus":3140,"cxt":31414,"by":[["กุดข้าวปุ้น",2010],["ตระการพืชผล",1130]]},{"n":"7051351310","t":"2026-10-29 14:51","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":9125,"cxt":751,"by":[["กุดข้าวปุ้น",7996],["ตระการพืชผล",1129]]},{"n":"7052603388","t":"2026-10-30 14:03","dur":7,"st":"T/L","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"บุชชิ่ง","det":"","wo":"","cus":9124,"cxt":62245,"by":[["กุดข้าวปุ้น",7996],["ตระการพืชผล",1128]]},{"n":"7053545527","t":"2026-10-31 09:58","dur":19,"st":"T/L","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"SAC","det":"","wo":"","cus":3137,"cxt":56121,"by":[["กุดข้าวปุ้น",2009],["ตระการพืชผล",1128]]}]},"UBV03VB-01":{"typ":"Circuit Breaker_MV","offs":[["เมืองอุบลราชธานี","E01101",71324,16605],["วารินชำราบ","E13101",0,0],["เขื่องใน","E01601",0,0]],"ev":[{"n":"7014486600","t":"2026-10-01 16:42","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":8354,"cxt":420,"by":[["เมืองอุบลราชธานี",8354]]},{"n":"7026361211","t":"2026-10-10 05:42","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"กระบอกฟิวส์","det":"","wo":"","cus":8368,"cxt":903,"by":[["เมืองอุบลราชธานี",8368]]},{"n":"7027418464","t":"2026-10-11 08:00","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"กระบอกฟิวส์","det":"","wo":"","cus":8362,"cxt":419,"by":[["เมืองอุบลราชธานี",8362]]},{"n":"7029610477","t":"2026-10-12 15:31","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"PIC","det":"","wo":"","cus":8357,"cxt":459,"by":[["เมืองอุบลราชธานี",8357]]},{"n":"7029701038","t":"2026-10-12 16:52","dur":2,"st":"T/L","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"กระบอกฟิวส์","det":"","wo":"","cus":960,"cxt":1645,"by":[["เมืองอุบลราชธานี",960]]},{"n":"7035832922","t":"2026-10-17 05:48","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"PIC","det":"","wo":"","cus":8345,"cxt":1707,"by":[["เมืองอุบลราชธานี",8345]]},{"n":"7037422017","t":"2026-10-18 17:06","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"Fuse link","det":"","wo":"","cus":8338,"cxt":2013,"by":[["เมืองอุบลราชธานี",8338]]},{"n":"7049270474","t":"2026-10-28 07:59","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"Fuse link","det":"","wo":"","cus":5060,"cxt":278,"by":[["เมืองอุบลราชธานี",5060]]},{"n":"7050226318","t":"2026-10-28 17:22","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"อุปกรณ์","sc":"ชำรุด","fd":"","dp":"บุชชิ่ง","det":"","wo":"","cus":5060,"cxt":1251,"by":[["เมืองอุบลราชธานี",5060]]},{"n":"7050237771","t":"2026-10-28 17:26","dur":1,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"ไม่ทราบ","det":"","wo":"","cus":5060,"cxt":7225,"by":[["เมืองอุบลราชธานี",5060]]},{"n":"7052873426","t":"2026-10-30 17:14","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"ฝนตก ลมแรง","c":"ภัยธรรมชาติ","sc":"พายุฤดูร้อน/พายุดีเปรสชั่น","fd":"","dp":"PIC","det":"","wo":"","cus":5060,"cxt":285,"by":[["เมืองอุบลราชธานี",5060]]}]},"YTA08R-04":{"typ":"Recloser","offs":[["ป่าติ้ว","E03105",39014,320775],["เมืองยโสธร","E03101",3153,17090],["ไทยเจริญ","E03108",489,4444],["เมืองอำนาจเจริญ","E08101",0,0]],"ev":[{"n":"7021061169","t":"2026-10-06 09:09","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":881,"cxt":74,"by":[["ป่าติ้ว",629],["เมืองยโสธร",252]]},{"n":"7024805566","t":"2026-10-09 05:56","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"เปลือย","det":"","wo":"","cus":1332,"cxt":112,"by":[["ป่าติ้ว",763],["เมืองยโสธร",569]]},{"n":"7029469123","t":"2026-10-12 14:05","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"เปลือย","det":"","wo":"","cus":783,"cxt":66,"by":[["ป่าติ้ว",783]]},{"n":"7033291547","t":"2026-10-15 00:39","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"นก/ค้างคาว","fd":"","dp":"PIC","det":"","wo":"","cus":761,"cxt":64,"by":[["ป่าติ้ว",761]]},{"n":"7033546400","t":"2026-10-15 10:00","dur":27,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":12542,"cxt":339782,"by":[["ป่าติ้ว",11756],["เมืองยโสธร",623],["ไทยเจริญ",163]]},{"n":"7036161366","t":"2026-10-17 12:02","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"Fuse link","det":"","wo":"","cus":12538,"cxt":1052,"by":[["ป่าติ้ว",11753],["เมืองยโสธร",622],["ไทยเจริญ",163]]},{"n":"7036869245","t":"2026-10-18 06:53","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":537,"cxt":45,"by":[["ป่าติ้ว",489],["เมืองยโสธร",48]]},{"n":"7047059275","t":"2026-10-26 15:43","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":871,"cxt":73,"by":[["ป่าติ้ว",454],["เมืองยโสธร",417]]},{"n":"7052841913","t":"2026-10-30 17:00","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"ฝนตก ลมแรง","c":"ภัยธรรมชาติ","sc":"พายุฤดูร้อน/พายุดีเปรสชั่น","fd":"","dp":"OHGW","det":"","wo":"","cus":12411,"cxt":1041,"by":[["ป่าติ้ว",11626],["เมืองยโสธร",622],["ไทยเจริญ",163]]}]},"ZTA04R-01":{"typ":"Recloser","offs":[["บุณฑริก","E12301",31974,329378]],"ev":[{"n":"7030340790","t":"2026-10-13 10:30","dur":0,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":4008,"cxt":341,"by":[["บุณฑริก",4008]]},{"n":"7030473056","t":"2026-10-13 13:57","dur":1,"st":"T/R","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":4008,"cxt":4008,"by":[["บุณฑริก",4008]]},{"n":"7033606227","t":"2026-10-15 11:08","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"PIC","det":"","wo":"","cus":4002,"cxt":340,"by":[["บุณฑริก",4002]]},{"n":"7044289973","t":"2026-10-24 08:31","dur":0,"st":"T/R","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"สัตว์","sc":"งู","fd":"","dp":"กระบอกฟิวส์","det":"","wo":"","cus":3992,"cxt":340,"by":[["บุณฑริก",3992]]},{"n":"7047890339","t":"2026-10-27 09:14","dur":18,"st":"T/L","ph":"ABC","k":"ไม่พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"OHGW","det":"","wo":"","cus":3991,"cxt":69613,"by":[["บุณฑริก",3991]]},{"n":"7049396528","t":"2026-10-28 09:27","dur":19,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":3991,"cxt":76510,"by":[["บุณฑริก",3991]]},{"n":"7050966927","t":"2026-10-29 09:17","dur":27,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":3991,"cxt":107713,"by":[["บุณฑริก",3991]]},{"n":"7051475654","t":"2026-10-29 16:25","dur":18,"st":"T/L","ph":"ABC","k":"พบสาเหตุ","wx":"อากาศปกติ","c":"ไม่ใช่เหตุการณ์จริง","sc":"ไม่ใช่เหตุการณ์จริง","fd":"","dp":"PIC","det":"","wo":"","cus":3991,"cxt":70513,"by":[["บุณฑริก",3991]]}]}},"region":{"events":3903,"cus":5362027,"cxt":56958488,"offices":119,"cause":{"ฉุกเฉิน":[30,4866,61461],"ต้นไม้":[271,342384,1776521],"บุคคลภายนอก":[6,1988,29320],"พนักงานกฟภ.":[3,2001,2353],"ภัยธรรมชาติ":[575,892146,7011337],"ยานพาหนะ":[1,9572,2496],"วัสดุแปลกปลอม":[104,166781,418577],"สภาพสิ่งแวดล้อม":[117,43523,463112],"สัตว์":[1835,2297257,8675640],"อุบัติเหตุร้ายแรง":[1,5439,76146],"อุปกรณ์":[714,846428,3778237],"แหล่งผลิตขัดข้อง":[1,0,0],"โหลดเกินพิกัด":[8,1743,17753],"ไม่ใช่เหตุการณ์จริง":[237,747899,34645535]}}};
+const ORG = [{"no":1,"name":"กฟจ.อุบลราชธานี","lvl":"LMS","parent":null,"group":"กฟจ.อุบลราชธานี","abbr":"กฟส.อบ.","eng":"UBN"},{"no":2,"name":"กฟย.ตาลสุม","lvl":"XS","parent":"กฟจ.อุบลราชธานี","group":"กฟจ.อุบลราชธานี","abbr":"กฟส.ตส.","eng":"TS"},{"no":3,"name":"กฟส.เขื่องใน","lvl":"LMS","parent":null,"group":"กฟจ.อุบลราชธานี","abbr":"กฟส.ขน.","eng":"KNI"},{"no":4,"name":"กฟย.บ้านกอก","lvl":"XS","parent":"กฟส.เขื่องใน","group":"กฟจ.อุบลราชธานี","abbr":"กฟส.บกก.","eng":"BK"},{"no":5,"name":"กฟส.ม่วงสามสิบ","lvl":"LMS","parent":null,"group":"กฟจ.อุบลราชธานี","abbr":"กฟส.มสส.","eng":"MSS"},{"no":6,"name":"กฟจ.ศรีสะเกษ","lvl":"LMS","parent":null,"group":"กฟจ.ศรีสะเกษ","abbr":"กฟจ.ศก.","eng":"SJK"},{"no":7,"name":"กฟย.พยุห์","lvl":"XS","parent":"กฟจ.ศรีสะเกษ","group":"กฟจ.ศรีสะเกษ","abbr":"กฟส.พยุห์","eng":"PYU"},{"no":8,"name":"กฟย.ยางชุมน้อย","lvl":"XS","parent":"กฟจ.ศรีสะเกษ","group":"กฟจ.ศรีสะเกษ","abbr":"กฟส.ยชน.","eng":"YCN"},{"no":9,"name":"กฟย.วังหิน","lvl":"XS","parent":"กฟจ.ศรีสะเกษ","group":"กฟจ.ศรีสะเกษ","abbr":"กฟส.วังหิน","eng":"WHN"},{"no":10,"name":"กฟย.น้ำเกลี้ยง","lvl":"XS","parent":"กฟจ.ศรีสะเกษ","group":"กฟจ.ศรีสะเกษ","abbr":"กฟส.นกง.","eng":"NKL"},{"no":11,"name":"กฟส.อุทุมพรพิสัย","lvl":"LMS","parent":null,"group":"กฟจ.ศรีสะเกษ","abbr":"กฟส.อพ.","eng":"UTP"},{"no":12,"name":"กฟย.ห้วยทับทัน","lvl":"XS","parent":"กฟส.อุทุมพรพิสัย","group":"กฟจ.ศรีสะเกษ","abbr":"กฟส.หทท.","eng":"HTT"},{"no":13,"name":"กฟย.บึงบูรพ์","lvl":"XS","parent":"กฟส.อุทุมพรพิสัย","group":"กฟจ.ศรีสะเกษ","abbr":"กฟส.บงบ.","eng":"BBN"},{"no":14,"name":"กฟส.ขุขันธ์","lvl":"LMS","parent":null,"group":"กฟจ.ศรีสะเกษ","abbr":"กฟส.ขข.","eng":"KUK"},{"no":15,"name":"กฟย.ภูสิงห์","lvl":"XS","parent":"กฟส.ขุขันธ์","group":"กฟจ.ศรีสะเกษ","abbr":"กฟส.ภส.","eng":"PSG"},{"no":16,"name":"กฟย.ปรางค์กู่","lvl":"XS","parent":"กฟส.ขุขันธ์","group":"กฟจ.ศรีสะเกษ","abbr":"กฟส.ปรก.","eng":"PKU"},{"no":17,"name":"กฟส.ราษีไศล","lvl":"LMS","parent":null,"group":"กฟจ.ศรีสะเกษ","abbr":"กฟส.รศ.","eng":"LSS"},{"no":18,"name":"กฟส.กันทรารมย์","lvl":"LMS","parent":null,"group":"กฟส.กันทรารมย์","abbr":"กฟส.กร.","eng":"KTM"},{"no":19,"name":"กฟจ.ยโสธร","lvl":"LMS","parent":null,"group":"กฟจ.ยโสธร","abbr":"กฟส.ยส.","eng":"YST"},{"no":20,"name":"กฟย.คำเขื่อนแก้ว","lvl":"XS","parent":"กฟจ.ยโสธร","group":"กฟจ.ยโสธร","abbr":"กฟส.คข.","eng":"KKK"},{"no":21,"name":"กฟย.กุดชุม","lvl":"XS","parent":"กฟจ.ยโสธร","group":"กฟจ.ยโสธร","abbr":"กฟส.กชม.","eng":"KCM"},{"no":22,"name":"กฟย.ทรายมูล","lvl":"XS","parent":"กฟจ.ยโสธร","group":"กฟจ.ยโสธร","abbr":"กฟส.ทรม.","eng":"SMN"},{"no":23,"name":"กฟย.ป่าติ้ว","lvl":"XS","parent":"กฟจ.ยโสธร","group":"กฟจ.ยโสธร","abbr":"กฟส.ปตว.","eng":"PTI"},{"no":24,"name":"กฟย.ไทยเจริญ","lvl":"XS","parent":"กฟจ.ยโสธร","group":"กฟจ.ยโสธร","abbr":"กฟส.ทจร.","eng":"TCH"},{"no":25,"name":"กฟส.พนมไพร","lvl":"LMS","parent":null,"group":"กฟจ.ยโสธร","abbr":"กฟส.พนพ.","eng":"PNP"},{"no":26,"name":"กฟย.หนองฮี","lvl":"XS","parent":"กฟส.พนมไพร","group":"กฟจ.ยโสธร","abbr":"กฟส.นงฮ.","eng":"NHI"},{"no":27,"name":"กฟส.มหาชนะชัย","lvl":"LMS","parent":null,"group":"กฟจ.ยโสธร","abbr":"กฟส.มช.","eng":"MCC"},{"no":28,"name":"กฟย.ค้อวัง","lvl":"XS","parent":"กฟส.มหาชนะชัย","group":"กฟจ.ยโสธร","abbr":"กฟส.ค้อวัง","eng":"KWG"},{"no":29,"name":"กฟจ.มหาสารคาม","lvl":"LMS","parent":null,"group":"กฟจ.มหาสารคาม","abbr":"กฟส.มค.","eng":"MHK"},{"no":30,"name":"กฟย.แกดำ","lvl":"XS","parent":"กฟจ.มหาสารคาม","group":"กฟจ.มหาสารคาม","abbr":"กฟส.แกดำ","eng":"KDM"},{"no":31,"name":"กฟส.วาปีปทุม","lvl":"LMS","parent":null,"group":"กฟจ.มหาสารคาม","abbr":"กฟส.วป.","eng":"WPT"},{"no":32,"name":"กฟย.นาดูน","lvl":"XS","parent":"กฟส.วาปีปทุม","group":"กฟจ.มหาสารคาม","abbr":"กฟส.นดน.","eng":"NDN"},{"no":33,"name":"กฟส.พยัคฆภูมิพิสัย","lvl":"LMS","parent":null,"group":"กฟจ.มหาสารคาม","abbr":"กฟส.พภ.","eng":"PYK"},{"no":34,"name":"กฟย.นาเชือก","lvl":"XS","parent":"กฟส.พยัคฆภูมิพิสัย","group":"กฟจ.มหาสารคาม","abbr":"กฟส.นซก.","eng":"NCK"},{"no":35,"name":"กฟย.ยางสีสุราช","lvl":"XS","parent":"กฟส.พยัคฆภูมิพิสัย","group":"กฟจ.มหาสารคาม","abbr":"กฟส.ยสส.","eng":"YSR"},{"no":36,"name":"กฟส.โกสุมพิสัย","lvl":"LMS","parent":null,"group":"กฟจ.มหาสารคาม","abbr":"กฟส.กสพ.","eng":"KSP"},{"no":37,"name":"กฟส.บรบือ","lvl":"LMS","parent":null,"group":"กฟจ.มหาสารคาม","abbr":"กฟส.บบ.","eng":"BRB"},{"no":38,"name":"กฟย.กุดรัง","lvl":"XS","parent":"กฟส.บรบือ","group":"กฟจ.มหาสารคาม","abbr":"กฟส.กรง.","eng":"KTR"},{"no":39,"name":"กฟส.เชียงยืน","lvl":"LMS","parent":null,"group":"กฟจ.มหาสารคาม","abbr":"กฟส.ชยน.","eng":"CYN"},{"no":40,"name":"กฟย.ชื่นชม","lvl":"XS","parent":"กฟส.เชียงยืน","group":"กฟจ.มหาสารคาม","abbr":"กฟส.ชชม.","eng":"CCM"},{"no":41,"name":"กฟส.กันทรวิชัย","lvl":"LMS","parent":null,"group":"กฟจ.มหาสารคาม","abbr":"กฟส.กวช.","eng":"KAN"},{"no":42,"name":"กฟจ.กาฬสินธุ์","lvl":"LMS","parent":null,"group":"กฟจ.กาฬสินธุ์","abbr":"กฟส.กส.","eng":"KLS"},{"no":43,"name":"กฟย.กมลาไสย","lvl":"XS","parent":"กฟจ.กาฬสินธุ์","group":"กฟจ.กาฬสินธุ์","abbr":"กฟส.กมส.","eng":"KLI"},{"no":44,"name":"กฟย.สหัสขันธ์","lvl":"XS","parent":"กฟจ.กาฬสินธุ์","group":"กฟจ.กาฬสินธุ์","abbr":"กฟส.สหข.","eng":"SHK"},{"no":45,"name":"กฟย.ร่องคำ","lvl":"XS","parent":"กฟจ.กาฬสินธุ์","group":"กฟจ.กาฬสินธุ์","abbr":"กฟส.รงค.","eng":"RKM"},{"no":46,"name":"กฟย.ดอนจาน","lvl":"XS","parent":"กฟจ.กาฬสินธุ์","group":"กฟจ.กาฬสินธุ์","abbr":"กฟส.ดจน.","eng":"DCN"},{"no":47,"name":"กฟส.ยางตลาด","lvl":"LMS","parent":null,"group":"กฟจ.กาฬสินธุ์","abbr":"กฟส.ยต.","eng":"YTL"},{"no":48,"name":"กฟย.ฆ้องชัย","lvl":"XS","parent":"กฟส.ยางตลาด","group":"กฟจ.กาฬสินธุ์","abbr":"กฟส.ฆช.","eng":"KCI"},{"no":49,"name":"กฟส.หนองกุงศรี","lvl":"LMS","parent":null,"group":"กฟจ.กาฬสินธุ์","abbr":"กฟส.นกศ.","eng":"NKS"},{"no":50,"name":"กฟย.ห้วยเม็ก","lvl":"XS","parent":"กฟส.หนองกุงศรี","group":"กฟจ.กาฬสินธุ์","abbr":"กฟส.หม.","eng":"HMK"},{"no":51,"name":"กฟย.ท่าคันโท","lvl":"XS","parent":"กฟส.หนองกุงศรี","group":"กฟจ.กาฬสินธุ์","abbr":"กฟส.ทคท.","eng":"TKT"},{"no":52,"name":"กฟจ.ร้อยเอ็ด","lvl":"LMS","parent":null,"group":"กฟจ.ร้อยเอ็ด","abbr":"กฟส.รอ.","eng":"ROE"},{"no":53,"name":"กฟย.จตุรพักตรพิมาน","lvl":"XS","parent":"กฟจ.ร้อยเอ็ด","group":"กฟจ.ร้อยเอ็ด","abbr":"กฟส.จม.","eng":"CPP"},{"no":54,"name":"กฟย.ธวัชบุรี","lvl":"XS","parent":"กฟจ.ร้อยเอ็ด","group":"กฟจ.ร้อยเอ็ด","abbr":"กฟส.ธว.","eng":"TBR"},{"no":55,"name":"กฟย.เมืองสรวง","lvl":"XS","parent":"กฟจ.ร้อยเอ็ด","group":"กฟจ.ร้อยเอ็ด","abbr":"กฟส.มสง.","eng":"MSG"},{"no":56,"name":"กฟย.ธงธานี","lvl":"XS","parent":"กฟจ.ร้อยเอ็ด","group":"กฟจ.ร้อยเอ็ด","abbr":"กฟส.ธน.","eng":"TTN"},{"no":57,"name":"กฟย.เชียงขวัญ","lvl":"XS","parent":"กฟจ.ร้อยเอ็ด","group":"กฟจ.ร้อยเอ็ด","abbr":"กฟส.ชขญ.","eng":"CKN"},{"no":58,"name":"กฟย.ศรีสมเด็จ","lvl":"XS","parent":"กฟจ.ร้อยเอ็ด","group":"กฟจ.ร้อยเอ็ด","abbr":"กฟส.ศสด.","eng":"SSD"},{"no":59,"name":"กฟย.จังหาร","lvl":"XS","parent":"กฟจ.ร้อยเอ็ด","group":"กฟจ.ร้อยเอ็ด","abbr":"กฟส.จหร.","eng":"CNG"},{"no":60,"name":"กฟส.สุวรรณภูมิ","lvl":"LMS","parent":null,"group":"กฟจ.ร้อยเอ็ด","abbr":"กฟส.สณ.","eng":"SWP"},{"no":61,"name":"กฟย.โพนทราย","lvl":"XS","parent":"กฟส.สุวรรณภูมิ","group":"กฟจ.ร้อยเอ็ด","abbr":"กฟส.พทย.","eng":"PNS"},{"no":62,"name":"กฟส.เกษตรวิสัย","lvl":"LMS","parent":null,"group":"กฟจ.ร้อยเอ็ด","abbr":"กพ่ส.กษ.","eng":"KWS"},{"no":63,"name":"กฟย.ปทุมรัตต์","lvl":"XS","parent":"กฟส.เกษตรวิสัย","group":"กฟจ.ร้อยเอ็ด","abbr":"กฟส.ปทต.","eng":"PTR"},{"no":64,"name":"กฟส.อาจสามารถ","lvl":"LMS","parent":null,"group":"กฟจ.ร้อยเอ็ด","abbr":"กฟส.อส.","eng":"ASM"},{"no":65,"name":"กฟจ.มุกดาหาร","lvl":"LMS","parent":null,"group":"กฟจ.มุกดาหาร","abbr":"กฟส.มตห.","eng":"MDH"},{"no":66,"name":"กฟย.นิคมคำสร้อย","lvl":"XS","parent":"กฟจ.มุกดาหาร","group":"กฟจ.มุกดาหาร","abbr":"กฟส.นคส.","eng":"NKM"},{"no":67,"name":"กฟย.ดอนตาล","lvl":"XS","parent":"กฟจ.มุกดาหาร","group":"กฟจ.มุกดาหาร","abbr":"กฟส.ดต.","eng":"DTN"},{"no":68,"name":"กฟย.หว้านใหญ่","lvl":"XS","parent":"กฟจ.มุกดาหาร","group":"กฟจ.มุกดาหาร","abbr":"กฟส.หวญ.","eng":"WNY"},{"no":69,"name":"กฟส.คำชะอี","lvl":"LMS","parent":null,"group":"กฟจ.มุกดาหาร","abbr":"กฟส.คช.","eng":"KCE"},{"no":70,"name":"กฟย.หนองสูง","lvl":"XS","parent":"กฟส.คำชะอี","group":"กฟจ.มุกดาหาร","abbr":"กฟส.นสง.","eng":"NSG"},{"no":71,"name":"กฟย.ดงหลวง","lvl":"XS","parent":"กฟส.คำชะอี","group":"กฟจ.มุกดาหาร","abbr":"กฟส.ดล.","eng":"DLG"},{"no":72,"name":"กฟย.กกตูม","lvl":"XS","parent":"กฟส.คำชะอี","group":"กฟจ.มุกดาหาร","abbr":"กฟส.กกตูม","eng":"KKT"},{"no":73,"name":"กฟจ.อำนาจเจริญ","lvl":"LMS","parent":null,"group":"กฟจ.อำนาจเจริญ","abbr":"กฟส.อจ.","eng":"ANC"},{"no":74,"name":"กฟย.เสนางคนิคม","lvl":"XS","parent":"กฟจ.อำนาจเจริญ","group":"กฟจ.อำนาจเจริญ","abbr":"กฟส.สนค.","eng":"SNK"},{"no":75,"name":"กฟย.ลืออำนาจ","lvl":"XS","parent":"กฟจ.อำนาจเจริญ","group":"กฟจ.อำนาจเจริญ","abbr":"กฟส.ลอน.","eng":"LAN"},{"no":76,"name":"กฟย.หัวตะพาน","lvl":"XS","parent":"กฟจ.อำนาจเจริญ","group":"กฟจ.อำนาจเจริญ","abbr":"กฟส.หตพ.","eng":"HTP"},{"no":77,"name":"กฟย.ปทุมราชวงศา","lvl":"XS","parent":"กฟจ.อำนาจเจริญ","group":"กฟจ.อำนาจเจริญ","abbr":"กฟส.ปรศ.","eng":"PRW"},{"no":78,"name":"กฟย.พนา","lvl":"XS","parent":"กฟจ.อำนาจเจริญ","group":"กฟจ.อำนาจเจริญ","abbr":"กฟส.พนา","eng":"PNA"},{"no":79,"name":"กฟย.ชานุมาน","lvl":"XS","parent":"กฟจ.อำนาจเจริญ","group":"กฟจ.อำนาจเจริญ","abbr":"กฟส.ชนม.","eng":"CNM"},{"no":80,"name":"กฟส.เลิงนกทา","lvl":"LMS","parent":null,"group":"กฟจ.อำนาจเจริญ","abbr":"กฟส.ลท.","eng":"LNT"},{"no":81,"name":"กฟอ.เสลภูมิ","lvl":"LMS","parent":null,"group":"กฟอ.เสลภูมิ","abbr":"กฟส.สล.","eng":"SLP"},{"no":82,"name":"กฟย.ทุ่งเขาหลวง","lvl":"XS","parent":"กฟอ.เสลภูมิ","group":"กฟอ.เสลภูมิ","abbr":"กฟส.ทขล.","eng":"TKH"},{"no":83,"name":"กฟส.โพนทอง","lvl":"LMS","parent":null,"group":"กฟอ.เสลภูมิ","abbr":"กฟส.พทง.","eng":"PTH"},{"no":84,"name":"กฟย.โพธิ์ชัย","lvl":"XS","parent":"กฟส.โพนทอง","group":"กฟอ.เสลภูมิ","abbr":"กฟส.พธช.","eng":"PCI"},{"no":85,"name":"กฟย.หนองพอก","lvl":"XS","parent":"กฟส.โพนทอง","group":"กฟอ.เสลภูมิ","abbr":"กฟส.นพก.","eng":"NPK"},{"no":86,"name":"กฟย.เมยวดี","lvl":"XS","parent":"กฟส.โพนทอง","group":"กฟอ.เสลภูมิ","abbr":"กฟส.มวด.","eng":"MWD"},{"no":87,"name":"กฟอ.สมเด็จ","lvl":"LMS","parent":null,"group":"กฟอ.สมเด็จ","abbr":"กฟส.สดจ.","eng":"SDJ"},{"no":88,"name":"กฟย.นามน","lvl":"XS","parent":"กฟอ.สมเด็จ","group":"กฟอ.สมเด็จ","abbr":"กฟส.นามน","eng":"NMN"},{"no":89,"name":"กฟย.คำม่วง","lvl":"XS","parent":"กฟอ.สมเด็จ","group":"กฟอ.สมเด็จ","abbr":"กฟส.คมว.","eng":"KMG"},{"no":90,"name":"กฟย.สามชัย","lvl":"XS","parent":"กฟอ.สมเด็จ","group":"กฟอ.สมเด็จ","abbr":"กฟส.สชย.","eng":"SCI"},{"no":91,"name":"กฟย.ห้วยผึ้ง","lvl":"XS","parent":"กฟอ.สมเด็จ","group":"กฟอ.สมเด็จ","abbr":"กฟส.หผ.","eng":"HPG"},{"no":92,"name":"กฟย.นาคู","lvl":"XS","parent":"กฟอ.สมเด็จ","group":"กฟอ.สมเด็จ","abbr":"กฟส.นาคู.","eng":"NKU"},{"no":93,"name":"กฟส.กุฉินารายณ์","lvl":"LMS","parent":null,"group":"กฟอ.สมเด็จ","abbr":"กฟส.กฉ.","eng":"KCN"},{"no":94,"name":"กฟย.เขาวง","lvl":"XS","parent":"กฟส.กุฉินารายณ์","group":"กฟอ.สมเด็จ","abbr":"กฟส.ขว.","eng":"KHW"},{"no":95,"name":"กฟอ.กันทรลักษ์","lvl":"LMS","parent":null,"group":"กฟอ.กันทรลักษ์","abbr":"กฟส.กทล.","eng":"KTL"},{"no":96,"name":"กฟย.ศรีรัตนะ","lvl":"XS","parent":"กฟอ.กันทรลักษ์","group":"กฟอ.กันทรลักษ์","abbr":"กฟส.ศรีรัตนะ","eng":"SRN"},{"no":97,"name":"กฟย.โนนคูณ","lvl":"XS","parent":"กฟอ.กันทรลักษ์","group":"กฟอ.กันทรลักษ์","abbr":"กฟส.โนนคูณ","eng":"NKN"},{"no":98,"name":"กฟย.เบญจลักษ์","lvl":"XS","parent":"กฟอ.กันทรลักษ์","group":"กฟอ.กันทรลักษ์","abbr":"กฟส.บจล.","eng":"BCL"},{"no":99,"name":"กฟส.ขุนหาญ","lvl":"LMS","parent":null,"group":"กฟอ.กันทรลักษ์","abbr":"กฟส.ขห.","eng":"KHN"},{"no":100,"name":"กฟย.ไพรบึง","lvl":"XS","parent":"กฟส.ขุนหาญ","group":"กฟอ.กันทรลักษ์","abbr":"กฟส.พบง.","eng":"PBG"},{"no":101,"name":"กฟอ.เดชอุดม","lvl":"LMS","parent":null,"group":"กฟอ.เดชอุดม","abbr":"กฟส.ดอ.","eng":"DUD"},{"no":102,"name":"กฟย.ทุ่งศรีอุดม","lvl":"XS","parent":"กฟอ.เดชอุดม","group":"กฟอ.เดชอุดม","abbr":"กฟส.ทศอ.","eng":"TU"},{"no":103,"name":"กฟย.นาเยีย","lvl":"XS","parent":"กฟอ.เดชอุดม","group":"กฟอ.เดชอุดม","abbr":"กฟส.นย.","eng":"NY"},{"no":104,"name":"กฟส.น้ำยืน","lvl":"LMS","parent":null,"group":"กฟอ.เดชอุดม","abbr":"กฟส.น้ำยืน","eng":"NYU"},{"no":105,"name":"กฟย.นาจะหลวย","lvl":"XS","parent":"กฟส.น้ำยืน","group":"กฟอ.เดชอุดม","abbr":"กฟส.นจล.","eng":"NJ"},{"no":106,"name":"กฟย.น้ำขุ่น","lvl":"XS","parent":"กฟส.น้ำยืน","group":"กฟอ.เดชอุดม","abbr":"กฟส.นข.","eng":"NK"},{"no":107,"name":"กฟส.บุณฑริก","lvl":"LMS","parent":null,"group":"กฟอ.เดชอุดม","abbr":"กฟส.บฑ.","eng":"BTR"},{"no":108,"name":"กฟอ.วารินชำราบ","lvl":"LMS","parent":null,"group":"กฟอ.วารินชำราบ","abbr":"กฟส.วรช.","eng":"WCH"},{"no":109,"name":"กฟย.สำโรง","lvl":"XS","parent":"กฟอ.วารินชำราบ","group":"กฟอ.วารินชำราบ","abbr":"กฟส.สร.","eng":"SR"},{"no":110,"name":"กฟย.ห้วยขะยูง","lvl":"XS","parent":"กฟอ.วารินชำราบ","group":"กฟอ.วารินชำราบ","abbr":"กฟส.หข.","eng":"HK"},{"no":111,"name":"กฟย.สว่างวีระวงศ์","lvl":"XS","parent":"กฟอ.วารินชำราบ","group":"กฟอ.วารินชำราบ","abbr":"กฟส.สวว.","eng":"WR"},{"no":112,"name":"กฟส.พิบูลมังสาหาร","lvl":"LMS","parent":null,"group":"กฟอ.วารินชำราบ","abbr":"กฟส.พมห.","eng":"PBM"},{"no":113,"name":"กฟย.โขงเจียม","lvl":"XS","parent":"กฟส.พิบูลมังสาหาร","group":"กฟอ.วารินชำราบ","abbr":"กฟส.ขจ.","eng":"KJ"},{"no":114,"name":"กฟย.สิรินธร","lvl":"XS","parent":"กฟส.พิบูลมังสาหาร","group":"กฟอ.วารินชำราบ","abbr":"กฟส.สรธ.","eng":"ST"},{"no":115,"name":"กฟอ.ตระการพืชผล","lvl":"LMS","parent":null,"group":"กฟอ.ตระการพืชผล","abbr":"กฟส.ตผ.","eng":"TPL"},{"no":116,"name":"กฟย.ศรีเมืองใหม่","lvl":"XS","parent":"กฟอ.ตระการพืชผล","group":"กฟอ.ตระการพืชผล","abbr":"กฟส.ศมม.","eng":"SM"},{"no":117,"name":"กฟย.โพธิ์ไทร","lvl":"XS","parent":"กฟอ.ตระการพืชผล","group":"กฟอ.ตระการพืชผล","abbr":"กฟส.พทร.","eng":"PT"},{"no":118,"name":"กฟย.กุดข้าวปุ้น","lvl":"XS","parent":"กฟอ.ตระการพืชผล","group":"กฟอ.ตระการพืชผล","abbr":"กฟส.กขป.","eng":"KP"},{"no":119,"name":"กฟส.เขมราฐ","lvl":"LMS","parent":null,"group":"กฟอ.ตระการพืชผล","abbr":"กฟส.ขร.","eng":"KML"}];
+const obase = x => String(x||'').replace(/^(กฟ[จอสย]\.)/,'').replace(/\u0E4C/g,'').trim();
+const ORGB = Object.fromEntries(ORG.map(o=>[obase(o.name),o]));
+function orgOf(raw){ const b=obase(raw); return ORGB[b] || ORGB[b.replace(/^เมือง/,'')] || ORGB[b.replace(/^บ้าน/,'')] || null; }
+const offName = raw => orgOf(raw)?.name || ('กฟส.'+raw);
+const offNo = raw => orgOf(raw)?.no ?? 999;
+const offGroup = raw => orgOf(raw)?.group || '';
+const REGION = {cus:5362027, cxt:56958488};
+const TERMS = [
+  {k:'s', t:'ระยะสั้น', what:'Patrol แก้ไขจุดเสี่ยง'},
+  {k:'m', t:'ระยะกลาง', what:'ติดตั้งอุปกรณ์ป้องกันสัตว์'},
+  {k:'l', t:'ระยะยาว', what:'ประมาณงานเปลี่ยนอุปกรณ์ทดแทนที่เสื่อมสภาพ'}
+];
+const SS = [
+  {k:'none', t:'ยังไม่กำหนดแผน', c:'var(--grey)'},
+  {k:'todo', t:'มีแผน ยังไม่ดำเนินการ', c:'var(--amber)'},
+  {k:'req',  t:'เสนอของบ / รออนุมัติ', c:'var(--blue)'},
+  {k:'work', t:'กำลังดำเนินการ', c:'var(--p500)'},
+  {k:'done', t:'แล้วเสร็จ', c:'var(--green)'},
+  {k:'na',   t:'ไม่จำเป็น', c:'var(--border)'}
+];
+const S = Object.fromEntries(SS.map(s=>[s.k,s]));
+const SHORT = {none:'ยังไม่มีแผน',todo:'ยังไม่ดำเนินการ',req:'รออนุมัติงบ',work:'กำลังดำเนินการ',done:'แล้วเสร็จ',na:'ไม่จำเป็น'};
+const LIM = {CB:9, Recloser:10, DF:3};
+const rid = r => 'r'+String(r.no).padStart(2,'0');
+const fmt = n => Number(n||0).toLocaleString('th-TH');
+const fmtM = n => n>=1e6 ? (n/1e6).toLocaleString('th-TH',{maximumFractionDigits:2})+' ล้าน' : fmt(n);
+const pct = (a,b)=> b? a/b*100 : 0;
+const today = new Date().toISOString().slice(0,10);
+const thDate = s => { if(!s) return '–'; const d=new Date(s+'T00:00:00'); return isNaN(d)?s:d.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}); };
+const el = (tag, attrs={}, ...kids) => { const e=document.createElement(tag); for(const [k,v] of Object.entries(attrs)){ if(k==='class') e.className=v; else if(k==='text') e.textContent=v; else if(k.startsWith('on')) e.addEventListener(k.slice(2),v); else if(v!==false&&v!=null) e.setAttribute(k,v);} for(const c of kids){ if(c==null||c===false) continue; e.append(c.nodeType?c:document.createTextNode(c)); } return e; };
+
+/* Default status comes from the Excel report (ระยะสั้น = Patrol แก้ไขจุดเสี่ยง, ช่องการดำเนินงานยังไม่ติ๊ก). */
+function fromExcel(r){
+  const st = (plan,done) => ({plan, status: done?'done':(plan?'todo':'none'), due:'', fin:'', budget:0, sap:'', result:''});
+  return {s:st(r.s,r.sd), m:st(r.m,r.md), l:st(r.l,r.ld), tree:{status:'',budget:0,km:0}, note:r.note||'', by:''};
+}
+let docs = {};   // rid -> stored doc
+let db=null, user=null, canWrite=null, myId=null, names={};
+let state = {off:'', st:'', open:null};
+try{ const s=JSON.parse(localStorage.getItem('pm20b')||'{}'); if(s.off) state.off=s.off; }catch(e){}
+const RISKS = [
+  {k:'tree', t:'ต้นไม้ / กิ่งไม้ใกล้แนวสาย'}, {k:'animal', t:'สัตว์ (งู นก กระรอก) / ไม่มี Animal guard'},
+  {k:'insul', t:'ลูกถ้วย / ฉนวนชำรุด'}, {k:'equip', t:'DF / LA / คอนเนคเตอร์ชำรุด'},
+  {k:'pole', t:'เสา / คอน / ยึดโยงชำรุด'}, {k:'wire', t:'สายหย่อน / สายชำรุด'},
+  {k:'guard', t:'Guard / Snake guy ชำรุด'}, {k:'other', t:'อื่น ๆ'}
+];
+const OUT = {done:{t:'แก้ไขแล้วเสร็จ',c:'s-done'}, part:{t:'แก้ไขบางส่วน มีจุดค้าง',c:'s-work'}, budget:{t:'ต้องของบ ส่งต่อระยะกลาง/ยาว',c:'s-req'}};
+let reports = [];   // patrol reports
+let assets = null;
+const reportsOf = id => reports.filter(p=>p.rid===id);
+const rsum = (p,f) => RISKS.reduce((s,k)=>s+(+p.risks?.[k.k]?.[f]||0),0);
+const pending = p => Math.max(0, rsum(p,'f')-rsum(p,'x'));
+function rec(r){
+  const base = docs[rid(r)] || fromExcel(r);
+  const rp = reportsOf(rid(r));
+  if(!rp.length) return base;
+  const allDone = rp.every(p=>p.outcome==='done' && pending(p)===0);
+  const fin = rp.map(p=>p.fixDate||'').sort().pop();
+  const found = rp.reduce((s,p)=>s+rsum(p,'f'),0), fixed = rp.reduce((s,p)=>s+rsum(p,'x'),0);
+  return {...base, s:{...base.s, plan: base.s.plan||'Patrol แก้ไขจุดเสี่ยง', status: allDone?'done':'work', fin: allDone?(fin||base.s.fin):base.s.fin,
+    result:`Patrol ${rp.length} ครั้ง · พบจุดเสี่ยง ${found} จุด แก้แล้ว ${fixed} จุด`, auto:true}};
+}
+const termLate = t => t && !['done','na','none'].includes(t.status) && t.due && t.due < today;
+function overall(r){
+  const d=rec(r), ts=TERMS.map(t=>d[t.k]||{status:'none'});
+  const live = ts.filter(t=>t.status!=='na');
+  if(TERMS.some(t=>termLate(d[t.k]))) return 'late';
+  if(live.length && live.every(t=>t.status==='done')) return 'done';
+  if(ts.some(t=>['req','work','done'].includes(t.status))) return 'work';
+  return 'none';
+}
+const OV = {none:{t:'ยังไม่เริ่ม',c:'s-todo'}, work:{t:'ระหว่างดำเนินการ',c:'s-work'}, late:{t:'เลยกำหนด',c:'s-late'}, done:{t:'ครบทุกระยะ',c:'s-done'}};
+const budgetOf = d => TERMS.reduce((s,t)=>s+(+d[t.k]?.budget||0),0) + (d.tree?.status? +d.tree.budget||0 : 0);
+
+/* filters */
+const norm = x => String(x||'').replace(/\u0E4C/g,'');
+const rowOffs=[...new Set(T20.map(r=>r.off))];
+const offices=[...rowOffs, ...Object.values(EVD.devs).flatMap(v=>v.offs.filter(o=>o[2]>0).map(o=>o[0])).filter(o=>!rowOffs.some(x=>norm(x)===norm(o)))]
+  .filter((o,i,a)=>a.indexOf(o)===i).sort((a,b)=>a.localeCompare(b,'th'));
+const devOffs = id => (EVD.devs[id]?.offs||[]);
+const affects = (id, off) => devOffs(id).some(o=>norm(o[0])===norm(off) && o[2]>0);
+const fOff=document.getElementById('fOff');
+(()=>{ const groups=[...new Set(ORG.map(o=>o.group))];
+  groups.forEach(g=>{ const og=el('optgroup',{label:g});
+    og.append(el('option',{value:'g:'+g,text:g+' (ทั้งสังกัด)'}));
+    offices.filter(o=>offGroup(o)===g).sort((a,b)=>offNo(a)-offNo(b)).forEach(o=>og.append(el('option',{value:o,text:'\u00a0\u00a0'+offName(o)})));
+    if(og.children.length>1) fOff.append(og); });
+  offices.filter(o=>!orgOf(o)).forEach(o=>fOff.append(el('option',{value:o,text:offName(o)})));
+})();
+fOff.value = state.off; if(fOff.value!==state.off) fOff.value=''; state.off=fOff.value;
+fOff.onchange=()=>{ state.off=fOff.value; try{localStorage.setItem('pm20b',JSON.stringify({off:state.off}))}catch(e){} render(); };
+document.getElementById('fSt').onchange=e=>{ state.st=e.target.value; render(); };
+const typeOk = r => !state.typ || r.g===state.typ;
+const offMatch = raw => !state.off || (state.off.startsWith('g:') ? offGroup(raw)===state.off.slice(2) : norm(raw)===norm(state.off));
+const affectsSel = id => devOffs(id).some(o=>o[2]>0 && offMatch(o[0]));
+const inScope = r => typeOk(r) && (!state.off || offMatch(r.off) || (!T20.some(x=>offMatch(x.off)) && affectsSel(r.id)));
+document.getElementById('fTyp').onchange=e=>{ state.typ=e.target.value; render(); };
+
+
+function render(){
+  renderAna(); renderOfc();
+  const rows=T20.filter(inScope);
+  renderPatrol(rows);
+  const bp=document.getElementById('bPatrol'); bp.disabled = !db || canWrite===false;
+  const bo=document.getElementById('bOfc'); bo.disabled = bp.disabled; bo.title = !db?'เปิดลิงก์ Dashboard และเข้าสู่ระบบ claude.ai เพื่อกรอกข้อมูล':(canWrite===false?'สิทธิ์ของท่านดูได้อย่างเดียว ขอสิทธิ์ Contributor จากผู้ดูแล':'');
+  bp.title = !db?'เข้าสู่ระบบและมีสิทธิ์บันทึกข้อมูลเพื่อรายงาน':(canWrite===false?'สิทธิ์ของท่านดูได้อย่างเดียว':'');
+  document.getElementById('mDev').textContent = new Set(T20.map(r=>r.id)).size;
+  document.getElementById('mOff').textContent = rowOffs.length;
+  document.getElementById('mCus').textContent = fmt(T20.reduce((s,r)=>s+r.cus,0));
+  // KPIs
+  const sDone=rows.filter(r=>rec(r).s.status==='done').length;
+  document.getElementById('kS').replaceChildren(fmt(sDone), el('small',{text:' / '+rows.length+' รายการ'}));
+  document.getElementById('kSBar').style.width=pct(sDone,rows.length)+'%';
+  document.getElementById('kSSub').textContent = 'แล้วเสร็จ '+pct(sDone,rows.length).toFixed(0)+'% · กำลังทำ '+rows.filter(r=>rec(r).s.status==='work').length;
+  const ov = rows.map(overall);
+  document.getElementById('kAll').replaceChildren(fmt(ov.filter(x=>x==='done').length), el('small',{text:' / '+rows.length}));
+  document.getElementById('kAllSub').textContent = 'ระหว่างดำเนินการ '+ov.filter(x=>x==='work').length+' · ยังไม่เริ่ม '+ov.filter(x=>x==='none').length;
+  const bud = rows.reduce((s,r)=>s+budgetOf(rec(r)),0);
+  const tree = rows.filter(r=>rec(r).tree?.status).length;
+  document.getElementById('kBud').replaceChildren(fmtM(bud), el('small',{text:' บาท'}));
+  document.getElementById('kBudSub').textContent = 'รวมของบตัดต้นไม้กรณีพิเศษ '+tree+' รายการ';
+  const late = ov.filter(x=>x==='late').length, noplan = rows.filter(r=>{const d=rec(r); return d.m.status==='none'||d.l.status==='none';}).length;
+  document.getElementById('kLate').replaceChildren(fmt(late), el('small',{text:' เลยกำหนด'}));
+  document.getElementById('kLateSub').textContent = 'ยังไม่กำหนดแผนระยะกลาง/ยาว '+noplan+' รายการ';
+  // terms
+  const tw=document.getElementById('terms'); tw.replaceChildren();
+  TERMS.forEach(t=>{
+    const c = SS.map(s=>({...s,n:rows.filter(r=>(rec(r)[t.k]?.status||'none')===s.k).length}));
+    const done=c.find(x=>x.k==='done').n, live=rows.length-c.find(x=>x.k==='na').n;
+    const stack=el('div',{class:'stack'}); c.forEach(s=>{ if(s.n) stack.append(el('i',{style:`width:${pct(s.n,rows.length)}%;background:${s.c}`,title:s.t+' '+s.n})); });
+    const leg=el('div',{class:'legend'}); c.filter(s=>s.n).forEach(s=>leg.append(el('span',{},el('i',{class:'sw',style:'background:'+s.c}),s.t+' ',el('b',{text:s.n}))));
+    const lt=rows.filter(r=>termLate(rec(r)[t.k])).length;
+    tw.append(el('div',{class:'term'}, el('h3',{text:t.t}), el('p',{class:'what',text:t.what}),
+      el('div',{class:'big'}, done+' ', el('small',{text:'/ '+live+' แล้วเสร็จ'+(lt?' · ':'')}), lt? el('small',{class:'late',text:'เลยกำหนด '+lt}):null), stack, leg));
+  });
+  // table
+  const tb=document.getElementById('tb'); tb.replaceChildren();
+  const list = rows.filter(r=>!state.st||overall(r)===state.st);
+  if(!list.length){ tb.append(el('tr',{},el('td',{colspan:12,class:'empty',text:'ไม่มีรายการตามตัวกรอง'}))); return; }
+  list.forEach(r=>{
+    const d=rec(r), o=OV[overall(r)], lim=LIM[r.g];
+    const tr=el('tr',{class:'row',tabindex:0,'aria-expanded':String(state.open===rid(r))},
+      el('td',{class:'n',text:r.no}),
+      el('td',{}, el('div',{class:'devid',text:r.id}), el('span',{class:'chip',text:r.g}), ' ', el('span',{class:'sm',text:r.fdr})),
+      offCell(r),
+      el('td',{class:'n'}, el('span',{class: lim&&r.cnt>=lim?'over':'',text:fmt(r.cnt)})),
+      el('td',{class:'n',text:fmt(r.dur)}),
+      el('td',{class:'n',text:fmt(r.cus)}),
+      el('td',{class:'n',text:fmt(r.cxt)}),
+      ...TERMS.map((t,i)=>termCell(d[t.k], i===0)),
+      el('td',{class:'bl'}, el('span',{class:'pill '+o.c,text:o.t}), d.tree?.status? el('div',{class:'sm',text:'ขอตัดต้นไม้กรณีพิเศษ'}):null),
+      el('td',{style:'white-space:nowrap'}, writeBtn('Patrol', e=>{e.stopPropagation(); openPatrol(null, r);}), ' ', writeBtn('อัปเดต', e=>{e.stopPropagation(); openForm(r);}, 'ghost')));
+    const tog=()=>{ state.open = state.open===rid(r)?null:rid(r); render(); };
+    tr.onclick=tog; tr.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();tog();} };
+    tb.append(tr);
+    if(state.open===rid(r)) tb.append(detail(r,d));
+  });
+}
+function offCell(r){
+  const offs=devOffs(r.id).filter(o=>o[2]>0);
+  const box=el('div',{class:'offl'});
+  [...offs].sort((a,b)=>offNo(a[0])-offNo(b[0])).forEach(o=>box.append(el('span',{class:'chip'+(norm(o[0])===norm(r.off)?' me':''),title:offName(o[0])+' · สังกัด '+offGroup(o[0])+' · ผู้ใช้ไฟได้รับผลกระทบ '+fmt(o[2])+' ราย · CusXTime '+fmt(o[3])}, offName(o[0])+' ', el('b',{text:fmt(o[2])}))));
+  return el('td',{class:'offcell'}, el('div',{style:'font-weight:600',text:offName(r.off)}), el('div',{class:'sm',text:'สังกัด '+(offGroup(r.off)||'–')+' · กระทบ '+offs.length+' กฟฟ.'}), box);
+}
+function termCell(t, first){
+  t = t||{status:'none'};
+  const late=termLate(t);
+  return el('td',{class:'tcell'+(first?' bl':'')}, el('span',{class:'pill s-'+(late?'late':t.status),text: late?'เลยกำหนด':SHORT[t.status]}), t.auto? el('span',{class:'auto',text:'จากรายงาน Patrol'}):null,
+    t.plan? el('div',{class:'plan',text:t.plan}):null,
+    t.due && t.status!=='done'? el('div',{class:'plan',text:'กำหนด '+thDate(t.due)}):null,
+    t.status==='done'&&t.fin? el('div',{class:'plan',text:'เสร็จ '+thDate(t.fin)}):null);
+}
+function detail(r,d){
+  const g=el('div',{class:'dgrid'});
+  TERMS.forEach(t=>{ const x=d[t.k]||{status:'none'};
+    g.append(el('div',{class:'dcard'}, el('h4',{}, t.t+' ', el('span',{class:'pill s-'+(termLate(x)?'late':x.status),text:S[x.status].t})),
+      el('p',{text:x.plan||'ยังไม่ได้ระบุแผน'}),
+      x.result? el('p',{class:'kv',text:'ผลการดำเนินงาน: '+x.result}):null,
+      el('div',{class:'kv'}, 'กำหนดเสร็จ ', el('b',{class:termLate(x)?'late':'',text:thDate(x.due)}), ' · เสร็จจริง ', el('b',{text:thDate(x.fin)})),
+      el('div',{class:'kv'}, 'งบ ', el('b',{text:fmt(x.budget)+' บาท'}), x.sap? ' · SAP '+x.sap:'')));
+  });
+  const extra=el('div',{class:'kv',style:'margin-top:8px'}, 'GIS tag '+r.gis+' · ฟีดเดอร์ '+r.fdr);
+  if(d.tree?.status) extra.append(' · ขอจ้างเหมาตัดต้นไม้กรณีพิเศษ: '+({req:'เสนอขอ',appr:'อนุมัติแล้ว',done:'ดำเนินการแล้ว'})[d.tree.status]+' '+fmt(d.tree.budget)+' บาท'+(d.tree.km?' · '+d.tree.km+' วงจร-กม.':''));
+  const td=el('td',{colspan:12}, g, extra);
+  const evs=EVD.devs[r.id]?.ev||[];
+  if(evs.length){ td.append(el('div',{class:'sm',style:'margin-top:10px',text:'เหตุการณ์ไฟฟ้าขัดข้องของอุปกรณ์นี้ '+evs.length+' ครั้ง (ทั้งอุปกรณ์ ทุก กฟส.)'}), evTable(evs, false)); }
+  const oa=devOffs(r.id).filter(o=>o[2]>0).map(o=>({o, a:ofcDocs[okey(r.id,o[1])]})).filter(x=>x.a);
+  if(oa.length){ td.append(el('div',{class:'sm',style:'margin-top:10px',text:'บันทึกการดำเนินงานราย กฟส.'}));
+    oa.forEach(x=>td.append(el('div',{class:'kv'}, el('b',{text:offName(x.o[0])+': '}), 'ระยะสั้น '+OS[x.a.s?.status||'none'].t+(x.a.s?.detail?' ('+x.a.s.detail+')':'')+' · ระยะกลาง '+OM[x.a.m?.status||'none'].t+(x.a.m?.plan?' ('+x.a.m.plan+')':'')))); }
+  const rp=reportsOf(rid(r)).sort((a,b)=>(b.fixDate||b.createdAt||'').localeCompare(a.fixDate||a.createdAt||''));
+  if(rp.length){ const box=el('div',{class:'reps',style:'margin-top:10px'}); rp.forEach(p=>box.append(repCard(p,false))); td.append(el('div',{class:'sm',style:'margin-top:10px',text:'รายงาน Patrol ระยะสั้น '+rp.length+' ครั้ง'}), box); }
+  if(d.note) td.append(el('div',{class:'kv',style:'margin-top:4px'}, 'หมายเหตุ: ', el('b',{text:d.note})));
+  if(d.updatedAt){ const who=el('b',{text:d.by||''}); td.append(el('div',{class:'kv',style:'margin-top:4px'}, 'อัปเดตล่าสุด '+new Date(d.updatedAt).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'})+' โดย ', who));
+    if(!d.by && d.updatedBy && user){ user.profiles([d.updatedBy]).then(ps=>{ who.textContent = ps[d.updatedBy]?.name || 'ผู้ใช้'; }); } }
+  return el('tr',{class:'detail'}, td);
+}
+function writeBtn(label, fn, cls=''){
+  const b=el('button',{type:'button',class:'btn '+cls,text:label}); b.onclick=fn;
+  if(!db || canWrite===false){ b.disabled=true; b.title = !db?'เข้าสู่ระบบและมีสิทธิ์บันทึกข้อมูลเพื่ออัปเดต':'สิทธิ์ของท่านดูได้อย่างเดียว'; }
+  return b;
+}
+
+/* form */
+const dlg=document.getElementById('dlg'), form=document.getElementById('form'), fsWrap=document.getElementById('fsWrap');
+TERMS.forEach(t=>{
+  const opts=SS.map(s=>el('option',{value:s.k,text:s.t}));
+  fsWrap.append(el('fieldset',{},
+    el('legend',{}, t.t+' ', el('small',{text:t.what})),
+    el('label',{class:'w2',for:t.k+'Plan'}, el('span',{text:'แผนงาน'}), el('input',{id:t.k+'Plan',type:'text',placeholder:t.what})),
+    el('label',{for:t.k+'St'}, el('span',{text:'สถานะ'}), el('select',{id:t.k+'St'},...opts)),
+    el('label',{for:t.k+'Due'}, el('span',{text:'กำหนดแล้วเสร็จ'}), el('input',{id:t.k+'Due',type:'date'})),
+    el('label',{for:t.k+'Fin'}, el('span',{text:'วันที่เสร็จจริง'}), el('input',{id:t.k+'Fin',type:'date'})),
+    el('label',{for:t.k+'Bud'}, el('span',{text:'งบประมาณ (บาท)'}), el('input',{id:t.k+'Bud',type:'number',min:0,step:1000,inputmode:'numeric'})),
+    el('label',{class:'w2',for:t.k+'Res'}, el('span',{text:'ผลการดำเนินงาน'}), el('input',{id:t.k+'Res',type:'text',placeholder:'เช่น ตัดกิ่งไม้ 12 จุด ติดตั้ง Animal guard 6 ชุด'})),
+    el('label',{for:t.k+'Sap'}, el('span',{text:'เลขที่ SAP (WBS/ZPM)'}), el('input',{id:t.k+'Sap',type:'text'}))));
+});
+let cur=null;
+const $=id=>document.getElementById(id);
+function openForm(r){
+  cur=r; const d=rec(r);
+  $('dlgT').textContent='อัปเดตการดำเนินงาน · #'+r.no+' '+r.id;
+  $('dlgSub').textContent=`${offName(r.off)} · ${r.g} ฟีดเดอร์ ${r.fdr} · ${fmt(r.cnt)} ครั้ง ${fmt(r.dur)} นาที · ${fmt(r.cus)} ราย · CusXTime ${fmt(r.cxt)}`;
+  TERMS.forEach(t=>{ const x=d[t.k]||{}; $(t.k+'Plan').value=x.plan||''; $(t.k+'St').value=x.status||'none'; $(t.k+'Due').value=x.due||''; $(t.k+'Fin').value=x.fin||''; $(t.k+'Bud').value=x.budget||''; $(t.k+'Res').value=x.result||''; $(t.k+'Sap').value=x.sap||''; });
+  $('sSt').disabled = !!d.s.auto; $('sSt').title = d.s.auto?'สถานะระยะสั้นคำนวณจากรายงาน Patrol':'';
+  $('tStatus').value=d.tree?.status||''; $('tBud').value=d.tree?.budget||''; $('tKm').value=d.tree?.km||'';
+  $('iNote').value=d.note||''; $('iBy').value=d.by||''; $('fMsg').textContent='';
+  dlg.showModal();
+}
+$('bCancel').onclick=()=>dlg.close();
+form.addEventListener('submit', async e=>{
+  e.preventDefault(); const msg=$('fMsg'); msg.textContent='';
+  const body={no:cur.no, device:cur.id, office:cur.off, month:'2569-10'};
+  const stored = docs[rid(cur)] || fromExcel(cur);
+  for(const t of TERMS){
+    let status = (t.k==='s' && $('sSt').disabled) ? stored.s.status : $(t.k+'St').value; const plan=$(t.k+'Plan').value.trim();
+    if(plan && status==='none') status='todo';
+    let fin=$(t.k+'Fin').value; if(status==='done' && !fin) fin=today;
+    body[t.k]={plan, status, due:$(t.k+'Due').value, fin, budget:Math.max(0,+$(t.k+'Bud').value||0), sap:$(t.k+'Sap').value.trim(), result:$(t.k+'Res').value.trim()};
+  }
+  body.tree={status:$('tStatus').value, budget:Math.max(0,+$('tBud').value||0), km:Math.max(0,+$('tKm').value||0)};
+  body.note=$('iNote').value.trim(); body.by=$('iBy').value.trim();
+  body.updatedAt=new Date().toISOString(); body.updatedBy=myId;
+  const btn=$('bSave'); btn.disabled=true;
+  try{ await db.collection('track').doc(rid(cur)).set(body); dlg.close(); toast('บันทึกแล้ว'); }
+  catch(err){ if(err&&err.code==='invalid_argument'&&canWrite!==true){canWrite=false; render();} msg.textContent=errText(err); }
+  finally{ btn.disabled=false; }
+});
+function errText(err){ const c=err&&err.code;
+  if(c==='remote'||c==='remote_net') return 'บันทึกลง Google Sheet ไม่สำเร็จ ตรวจสอบอินเทอร์เน็ตและ URL ของ Apps Script แล้วลองใหม่';
+  if(c==='invalid_argument') return 'บันทึกไม่ได้ สิทธิ์ของท่านอาจเป็นแบบดูอย่างเดียว ติดต่อผู้ดูแลหน้านี้เพื่อขอสิทธิ์ Contributor';
+  if(c==='resource_exhausted') return 'บันทึกถี่เกินไป รอสักครู่แล้วลองใหม่';
+  return 'บันทึกไม่สำเร็จ ตรวจสอบการเชื่อมต่อแล้วลองใหม่'; }
+let tt; function toast(t){ const x=$('toast'); x.textContent=t; x.hidden=false; clearTimeout(tt); tt=setTimeout(()=>x.hidden=true,2400); }
+
+$('srcNote').textContent=`ที่มา: ไฟล์การดำเนินงานบำรุงรักษาเชิงป้องกันจากอุปกรณ์ Top 20 (PM ALL) · ข้อมูลรายงาน 52 ตุลาคม 2569 · ไฟฟ้าขัดข้องของ CB Outgoing / Recloser / Drop out Fuse · ตัวเลขเป็นของ กฟส. ในแถวนั้น (TPP01VR-101 และ PYP04VB-01 จ่ายไฟ 2 กฟส. จึงมี 2 แถว) · 20 รายการรวมผู้ใช้ไฟ ${fmt(T20.reduce((s,r)=>s+r.cus,0))} ราย = ${pct(T20.reduce((s,r)=>s+r.cus,0),REGION.cus).toFixed(1)}% ของทั้ง กฟฉ.2 · CusXTime ${fmt(T20.reduce((s,r)=>s+r.cxt,0))} ราย·นาที = ${pct(T20.reduce((s,r)=>s+r.cxt,0),REGION.cxt).toFixed(1)}% · สถานะเริ่มต้นตามไฟล์: ระยะสั้นมีแผน Patrol แก้ไขจุดเสี่ยงทุกรายการ ยังไม่ติ๊กดำเนินการ`;
+
+/* ---------- Patrol (ระยะสั้น) ---------- */
+function renderPatrol(rows){
+  const ids=new Set(rows.map(rid));
+  const rp=reports.filter(p=>ids.has(p.rid));
+  const covered=new Set(rp.map(p=>p.rid)).size;
+  $('pN').replaceChildren(fmt(rp.length), el('small',{text:' ครั้ง'}));
+  $('pNSub').textContent='ครอบคลุม '+covered+' / '+rows.length+' รายการ';
+  const f=rp.reduce((s,p)=>s+rsum(p,'f'),0), x=rp.reduce((s,p)=>s+rsum(p,'x'),0);
+  $('pPend').replaceChildren(fmt(Math.max(0,f-x)), el('small',{text:' จุด'}));
+  $('pPendSub').textContent='พบ '+fmt(f)+' · แก้แล้ว '+fmt(x)+(f?' ('+pct(x,f).toFixed(0)+'%)':'');
+  const rt=$('riskTbl'); rt.replaceChildren();
+  RISKS.forEach(k=>{ const a=rp.reduce((s,p)=>s+(+p.risks?.[k.k]?.f||0),0), b=rp.reduce((s,p)=>s+(+p.risks?.[k.k]?.x||0),0);
+    rt.append(el('tr',{}, el('td',{text:k.t}), el('td',{class:'n',text:fmt(a)}), el('td',{class:'n',text:fmt(b)}), el('td',{class:'n'}, el('span',{class:a-b>0?'over':'',text:fmt(Math.max(0,a-b))})))); });
+  const rl=$('repList'); rl.replaceChildren();
+  const latest=[...rp].sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||'')).slice(0,6);
+  if(!latest.length) rl.append(el('div',{class:'empty',style:'grid-column:1/-1',text:'ยังไม่มีรายงาน Patrol กด "+ รายงานผล Patrol ระยะสั้น" แล้ววางข้อความจากไลน์ OUTAGE_NE2 เพื่อเริ่ม'}));
+  latest.forEach(p=>rl.append(repCard(p,true)));
+}
+function repCard(p, showDev){
+  const o=OUT[p.outcome]||OUT.part, ev=p.ev||{};
+  const card=el('div',{class:'rep'},
+    el('div',{class:'top'}, showDev? el('span',{class:'devid',text:'#'+p.no+' '+p.device}):null, el('span',{class:'pill '+o.c,text:o.t}), el('span',{class:'sp'}),
+      writeBtn('แก้ไข',()=>openPatrol(p),'ghost')),
+    el('div',{class:'kv'}, offName(p.office||'')+' · เหตุการณ์ ', el('b',{text:ev.event||'–'}), ' · ใบสั่ง ', el('b',{text:ev.order||'–'}),
+      ' · ไฟดับ ', el('b',{text:thDate(ev.date)+(ev.time?' '+ev.time+' น.':'')}), ev.status?' · '+ev.status:'', ev.current&&ev.current!=='-'?' · '+ev.current:''),
+    el('div',{class:'kv'}, 'สาเหตุ ', el('b',{text:p.cause||'–'}), ' · พบ ', el('b',{text:rsum(p,'f')+' จุด'}), ' แก้แล้ว ', el('b',{text:rsum(p,'x')+' จุด'}),
+      ' · แก้ไขวันที่ ', el('b',{text:thDate(p.fixDate)}), p.km?' · '+p.km+' วงจร-กม.':''),
+    p.result? el('p',{style:'margin:0;font-size:13.5px;overflow-wrap:anywhere;white-space:pre-wrap',text:p.result}):null);
+  if(p.photos?.length){ const th=el('div',{class:'thumbs'}); p.photos.forEach(id=>th.append(photoEl(id))); card.append(th); }
+  return card;
+}
+function photoEl(id){
+  const src='/_blob/'+id;
+  const img=el('img',{src,alt:'รูปประกอบรายงาน',loading:'lazy'});
+  img.onerror=()=>img.replaceWith(el('div',{class:'ph',text:'รูปไม่แสดง'}));
+  return el('a',{href:src,target:'_blank',rel:'noopener'}, img);
+}
+
+const TH_M={'ม.ค.':1,'ก.พ.':2,'มี.ค.':3,'เม.ย.':4,'พ.ค.':5,'มิ.ย.':6,'ก.ค.':7,'ส.ค.':8,'ก.ย.':9,'ต.ค.':10,'พ.ย.':11,'ธ.ค.':12};
+function parseLine(txt){
+  const g=(re)=>{ const m=txt.match(re); return m? m[1].trim() : ''; };
+  const out={ event:g(/หมายเลขเหตุการณ์\s*[:：]\s*(\d+)/), order:g(/หมายเลขใบสั่ง\s*[:：]\s*(\d+)/),
+    time:g(/เวลา\s*[:：]\s*(\d{1,2}[:.]\d{2})/).replace('.',':'),
+    device:g(/รหัสอุปกรณ์ที่ทำงาน\s*[:：]\s*([A-Za-z0-9][A-Za-z0-9\-.]*)/).toUpperCase(),
+    status:g(/สถานะ\s*[:：]\s*([^\n]+)/), phase:g(/Phase\s*Fault\s*[:：]\s*([^\n]+)/i), current:g(/กระแส\s*Fault\s*[:：]\s*([^\n]+)/i),
+    kff:g(/กฟฟ\.?\s*รับผิดชอบ\s*[:：]\s*([^\n]+)/), date:'' };
+  const dm=txt.match(/วันที่ไฟดับ\s*[:：]\s*(\d{1,2})\s*([ก-๙.]+)\s*(\d{2,4})/);
+  if(dm){ const mo=TH_M[dm[2].replace(/\s/g,'')]; let y=+dm[3]; if(y<100) y+=2500; if(y>2400) y-=543;
+    if(mo) out.date=`${y}-${String(mo).padStart(2,'0')}-${String(+dm[1]).padStart(2,'0')}`; }
+  if(out.time && out.time.length===4) out.time='0'+out.time;
+  return out;
+}
+const pdlg=$('pdlg'), pform=$('pform');
+RISKS.forEach(k=>$('pRisks').append(el('span',{class:'t',text:k.t}), el('input',{id:'rf-'+k.k,type:'number',min:0,step:1,inputmode:'numeric','aria-label':k.t+' พบ'}), el('input',{id:'rx-'+k.k,type:'number',min:0,step:1,inputmode:'numeric','aria-label':k.t+' แก้แล้ว'})));
+T20.forEach(r=>$('pRow').append(el('option',{value:rid(r),text:`#${r.no} ${r.id} · ${offName(r.off)}`})));
+let pcur=null, pPhotos=[];
+function setRowFromDevice(dev){
+  const box=$('pMatch'); box.replaceChildren();
+  if(!dev) return;
+  const hits=T20.filter(r=>r.id===dev);
+  if(!hits.length){ box.append(el('div',{class:'warn',text:`อุปกรณ์ ${dev} ไม่อยู่ใน 20 รายการเป้าหมาย เลือกรายการที่เกี่ยวข้องเองด้านล่าง หรือยกเลิกถ้าไม่ใช่อุปกรณ์เป้าหมาย`})); return; }
+  const pick = hits.find(r=>r.off===state.off) || hits[0];
+  $('pRow').value=rid(pick);
+  box.append(el('div',{class:'ok-t',text:`ตรงกับรายการเป้าหมาย #${pick.no} ${pick.id} · ${offName(pick.off)}`+(hits.length>1?` (อุปกรณ์นี้มี ${hits.length} กฟส. ตรวจสอบ กฟส. ให้ถูกต้อง)`:'')}));
+}
+$('pPaste').addEventListener('input', ()=>{
+  const p=parseLine($('pPaste').value), chips=$('pParsed'); chips.replaceChildren();
+  const set=(id,v)=>{ if(v) $(id).value=v; };
+  set('pEv',p.event); set('pOrd',p.order); set('pDate',p.date); set('pTime',p.time); set('pStat',p.status); set('pPh',p.phase); set('pCur',p.current);
+  [['เหตุการณ์',p.event],['ใบสั่ง',p.order],['วันที่',p.date&&thDate(p.date)],['เวลา',p.time],['อุปกรณ์',p.device],['สถานะ',p.status],['กฟฟ.',p.kff]]
+    .filter(x=>x[1]).forEach(x=>chips.append(el('span',{class:'chip',text:x[0]+' '+x[1]})));
+  pform.dataset.kff = p.kff||'';
+  setRowFromDevice(p.device);
+});
+
+/* ข้อความรายงานแก้ไขจากไลน์กลุ่ม PM all (พิมพ์อิสระ) */
+const KW = [
+  {k:'wire', re:/ยกสาย|สายหย่อน|ระยะปลอดภัย|ขึงสาย/}, {k:'tree', re:/ต้นไม้|กิ่ง|ไม้ไผ่|เถาวัลย์|ตัดไม้/}, {k:'animal', re:/animal|สัตว์|งู|นก|กระรอก|ครอบกันสัตว์/i},
+  {k:'guard', re:/snake|guard|สเนค/i}, {k:'insul', re:/ลูกถ้วย|ฉนวน|insulator/i},
+  {k:'equip', re:/cover\s*pg|pg|ดรอปเอาท์|drop\s*out|\bdf\b|\bla\b|คอนเนค|connector|จุดต่อ|ฟิวส์|ก้านล่อฟ้า/i},
+  {k:'pole', re:/เสา|คอน|ยึดโยง|สเตย์|stay|cross\s*arm/i}, {k:'wire', re:/สาย|หย่อน|ระยะปลอดภัย/}
+];
+function parseField(txt){
+  const out={date:'', office:'', devices:[], lines:[], risks:{}, where:''};
+  const dm=txt.match(/(\d{1,2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{2,4})/);
+  if(dm){ let y=+dm[3]; if(y<100) y+=2500; if(y>2400) y-=543; out.date=`${y}-${String(+dm[2]).padStart(2,'0')}-${String(+dm[1]).padStart(2,'0')}`; }
+  const om=txt.match(/(กฟ[สจฟ]\.\s*[ก-๙A-Za-z.]+)/); if(om) out.office=om[1].replace(/\s/g,'');
+  out.devices=[...new Set((txt.toUpperCase().match(/\b[A-Z]{3}\d{2}[A-Z]{0,3}-\d+[A-Z0-9]*\b/g)||[]))];
+  const L=txt.split(/\n/).map(s=>s.trim()).filter(Boolean);
+  out.lines=L.filter(s=>/^[-•*·]/.test(s)).map(s=>s.replace(/^[-•*·]\s*/,''));
+  out.where=L.find(s=>out.devices.some(d=>s.toUpperCase().includes(d)))||'';
+  (out.lines.length?out.lines:L.filter(s=>/แก้ไข|ติดตั้ง|ตัด|เปลี่ยน|ยก/.test(s))).forEach(s=>{
+    const hit=KW.find(k=>k.re.test(s)); const k=hit?hit.k:'other';
+    const n=+(s.match(/(\d+)\s*(จุด|ชุด|ต้น|ลูก|ตัว|แห่ง)/)||[])[1]||1;
+    out.risks[k]=(out.risks[k]||0)+n; });
+  return out;
+}
+$('pPaste2').addEventListener('input', ()=>{
+  const txt=$('pPaste2').value, p=parseField(txt), chips=$('pParsed2'), box=$('pMatch2');
+  chips.replaceChildren(); box.replaceChildren();
+  if(!txt.trim()) return;
+  if(p.date) $('pFix').value=p.date;
+  if(p.where && !$('pSpan').value) $('pSpan').value=p.where;
+  const res = (p.lines.length? p.lines.map(s=>'- '+s).join('\n') : txt.trim());
+  $('pRes').value=res;
+  if(p.office && !$('pBy').value) $('pBy').value=p.office;
+  RISKS.forEach(k=>{ if(p.risks[k.k]){ $('rf-'+k.k).value=Math.max(+$('rf-'+k.k).value||0,p.risks[k.k]); $('rx-'+k.k).value=Math.max(+$('rx-'+k.k).value||0,p.risks[k.k]); } });
+  [['วันที่แก้ไข',p.date&&thDate(p.date)],['หน่วยงาน',p.office],['อุปกรณ์',p.devices.join(', ')],['รายการแก้ไข',p.lines.length?p.lines.length+' ข้อ':'']]
+    .filter(x=>x[1]).forEach(x=>chips.append(el('span',{class:'chip',text:x[0]+' '+x[1]})));
+  const exact=T20.filter(r=>p.devices.includes(r.id));
+  const byFdr=T20.filter(r=>p.devices.some(d=>d.slice(0,5)===r.fdr));
+  if(exact.length){ $('pRow').value=rid(exact[0]); box.append(el('div',{class:'ok-t',text:`ตรงกับรายการเป้าหมาย #${exact[0].no} ${exact[0].id}`})); }
+  else if(byFdr.length){ $('pRow').value=rid(byFdr[0]); box.append(el('div',{class:'ok-t',text:`อุปกรณ์ ${p.devices.join(', ')} อยู่บนฟีดเดอร์ ${byFdr[0].fdr} ของรายการเป้าหมาย #${byFdr[0].no} ${byFdr[0].id}`})); }
+  else if(p.devices.length) box.append(el('div',{class:'warn',text:`อุปกรณ์ ${p.devices.join(', ')} ไม่อยู่บนฟีดเดอร์ของ 20 รายการเป้าหมาย ตรวจสอบรายการที่เลือกก่อนบันทึก`}));
+  box.append(el('div',{class:'sm',text:'จำนวนจุดเสี่ยงคิดจากรายการแก้ไขในข้อความ (ไม่ระบุจำนวน = 1 จุด) ตรวจสอบตัวเลขในข้อ 4 อีกครั้ง'}));
+});
+function openPatrol(p, row){
+  pcur=p; pPhotos=[...(p?.photos||[])];
+  pform.reset(); $('pParsed').replaceChildren(); $('pMatch').replaceChildren(); $('pParsed2').replaceChildren(); $('pMatch2').replaceChildren(); $('pMsg').textContent=''; pform.dataset.kff=p?.ev?.kff||'';
+  $('pT').textContent = p? 'แก้ไขรายงาน Patrol · #'+p.no+' '+p.device : 'รายงานผล Patrol แก้ไขจุดเสี่ยง (ระยะสั้น)';
+  const r = row || (p && T20.find(x=>rid(x)===p.rid)) || T20.find(inScope) || T20[0];
+  $('pRow').value=rid(r);
+  const ev=p?.ev||{};
+  $('pEv').value=ev.event||''; $('pOrd').value=ev.order||''; $('pDate').value=ev.date||''; $('pTime').value=ev.time||'';
+  $('pStat').value=ev.status||''; $('pPh').value=ev.phase||''; $('pCur').value=ev.current||'';
+  $('pCause').value=p?.cause||'ต้นไม้ / กิ่งไม้'; $('pFix').value=p?.fixDate||today; $('pKm').value=p?.km||''; $('pSpan').value=p?.span||'';
+  $('pCrew').value=p?.crew||''; $('pRes').value=p?.result||''; $('pOut').value=p?.outcome||'done'; $('pSap').value=p?.sap||ev.order||''; $('pBy').value=p?.by||'';
+  RISKS.forEach(k=>{ $('rf-'+k.k).value=p?.risks?.[k.k]?.f||''; $('rx-'+k.k).value=p?.risks?.[k.k]?.x||''; });
+  $('pPhotoWrap').hidden = !assets && !pPhotos.length;
+  $('pPhoto').disabled = !assets;
+  drawThumbs();
+  pdlg.showModal();
+}
+function drawThumbs(){
+  const t=$('pThumbs'); t.replaceChildren();
+  pPhotos.forEach((id,i)=>{ const x=el('div',{style:'position:relative'}, photoEl(id),
+    el('button',{type:'button',class:'btn ghost',style:'position:absolute;top:2px;right:2px;padding:0 6px;font-size:12px;background:var(--card)','aria-label':'เอารูปออก',text:'×',onclick:()=>{ pPhotos.splice(i,1); drawThumbs(); }}));
+    t.append(x); });
+}
+async function shrink(file){
+  try{ const bmp=await createImageBitmap(file); const s=Math.min(1,1600/Math.max(bmp.width,bmp.height));
+    const c=document.createElement('canvas'); c.width=Math.round(bmp.width*s); c.height=Math.round(bmp.height*s);
+    c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+    return await new Promise(res=>c.toBlob(b=>res(b||file),'image/jpeg',0.82)); }catch(e){ return file; }
+}
+$('pPhoto').addEventListener('change', async e=>{
+  const files=[...e.target.files].slice(0, Math.max(0,6-pPhotos.length)); const msg=$('pMsg');
+  for(const f of files){
+    msg.style.color='var(--muted)'; msg.textContent='กำลังอัปโหลดรูป…';
+    try{ const b=await shrink(f); const res=await assets.upload(b,{type:b.type||'image/jpeg'}); pPhotos.push(res.id); drawThumbs(); msg.textContent=''; }
+    catch(err){ msg.style.color=''; msg.textContent = err?.code==='too_large'?'รูปใหญ่เกิน 20 MB':(err?.code==='quota_or_state'?'พื้นที่เก็บรูปเต็ม แจ้งผู้ดูแลหน้านี้':'อัปโหลดรูปไม่สำเร็จ ลองใหม่อีกครั้ง'); break; }
+  }
+  e.target.value='';
+});
+$('bPatrol').onclick=()=>openPatrol(null);
+$('pCancel').onclick=()=>pdlg.close();
+pform.addEventListener('submit', async e=>{
+  e.preventDefault(); const msg=$('pMsg'); msg.style.color=''; msg.textContent='';
+  const r=T20.find(x=>rid(x)===$('pRow').value);
+  const risks={}; let bad=false;
+  RISKS.forEach(k=>{ const f=Math.max(0,+$('rf-'+k.k).value||0), x=Math.max(0,+$('rx-'+k.k).value||0); if(x>f) bad=true; if(f||x) risks[k.k]={f,x}; });
+  if(!r){ msg.textContent='เลือกรายการเป้าหมาย'; return; }
+  if(bad){ msg.textContent='จำนวนจุดที่แก้แล้วต้องไม่มากกว่าจุดที่พบ'; return; }
+  if(!$('pFix').value){ msg.textContent='ระบุวันที่แก้ไข'; return; }
+  let outcome=$('pOut').value;
+  const tot=Object.values(risks).reduce((s,v)=>s+v.f-v.x,0);
+  if(outcome==='done' && tot>0){ msg.textContent='ยังมีจุดค้าง '+tot+' จุด เลือกผล "แก้ไขบางส่วน" หรือ "ต้องของบ"'; return; }
+  const now=new Date().toISOString();
+  const body={ rid:rid(r), no:r.no, device:r.id, office:r.off, month:'2569-10',
+    ev:{event:$('pEv').value.trim(), order:$('pOrd').value.trim(), date:$('pDate').value, time:$('pTime').value, status:$('pStat').value.trim(), phase:$('pPh').value.trim(), current:$('pCur').value.trim(), kff:pform.dataset.kff||''},
+    cause:$('pCause').value, fixDate:$('pFix').value, km:Math.max(0,+$('pKm').value||0), span:$('pSpan').value.trim(), crew:$('pCrew').value.trim(),
+    risks, result:$('pRes').value.trim(), outcome, lineOutage:$('pPaste').value.trim()||pcur?.lineOutage||'', lineField:$('pPaste2').value.trim()||pcur?.lineField||'', sap:$('pSap').value.trim(), by:$('pBy').value.trim(), photos:pPhotos,
+    createdAt:pcur?.createdAt||now, createdBy:pcur?.createdBy||myId, updatedAt:now, updatedBy:myId };
+  const btn=$('pSave'); btn.disabled=true;
+  try{
+    if(pcur) await db.collection('patrol').doc(pcur.id).set(body); else await db.collection('patrol').add(body);
+    pdlg.close(); toast('บันทึกรายงาน Patrol แล้ว · สถานะระยะสั้นอัปเดตอัตโนมัติ');
+  }catch(err){ if(err&&err.code==='invalid_argument'&&canWrite!==true){canWrite=false; render();} msg.textContent=errText(err); }
+  finally{ btn.disabled=false; }
+});
+
+/* ---------- วิเคราะห์เหตุการณ์ ---------- */
+const DEV_G = Object.fromEntries(T20.map(r=>[r.id,r.g]));
+const DEV_F = Object.fromEntries(T20.map(r=>[r.id,r.fdr]));
+const ST_T = {'T/R':'Trip Reclose','T/L':'Trip Lockout','TR1':'Trip Reclose 1','TR2':'Trip Reclose 2','TR3':'Trip Reclose 3','D/F':'Drop out Fuse'};
+let aMode=0;
+document.querySelectorAll('#aMode button').forEach(b=>b.onclick=()=>{ aMode=+b.dataset.m; render(); });
+function scopeDevs(){ return Object.keys(EVD.devs).filter(id=>(!state.typ||DEV_G[id]===state.typ) && (!state.off || affectsSel(id))); }
+function scopeEvents(){
+  return scopeDevs().flatMap(id=>EVD.devs[id].ev.map(e=>({...e, dev:id})))
+    .filter(e=>!state.off || e.by.some(b=>offMatch(b[0])))
+    .map(e=>({...e, cusX: state.off ? e.by.filter(b=>offMatch(b[0])).reduce((s,b)=>s+b[1],0) : e.cus}));
+}
+function evTable(evs, showDev){
+  const t=el('table',{}), tb=el('tbody',{});
+  t.append(el('thead',{}, el('tr',{}, ...['วันเวลาไฟดับ', ...(showDev?['อุปกรณ์']:[]), 'หมายเลขเหตุการณ์','สถานะ','นาที','สาเหตุ','สภาพอากาศ','ผู้ใช้ไฟ','กฟส. ที่ได้รับผลกระทบ'].map((h,i)=>el('th',{class:['นาที','ผู้ใช้ไฟ'].includes(h)?'n':'',text:h})))), tb);
+  evs.forEach(e=>tb.append(el('tr',{},
+    el('td',{style:'white-space:nowrap',text:thDate(e.t.slice(0,10))+' '+e.t.slice(11)+' น.'}),
+    showDev? el('td',{}, el('span',{class:'devid',text:e.dev})):null,
+    el('td',{style:'font-variant-numeric:tabular-nums',text:e.n}),
+    el('td',{}, el('span',{class:'pill '+(e.st==='T/L'?'s-late':'s-none'),text:ST_T[e.st]||e.st||'–'})),
+    el('td',{class:'n',text:fmt(e.dur)}),
+    el('td',{}, el('div',{text:(e.sc||e.c||'–')}), el('div',{class:'sm',text:(e.c&&e.sc&&e.c!==e.sc?e.c+' · ':'')+(e.k||'')+(e.det?' · '+e.det:'')})),
+    el('td',{class:'sm',text:e.wx||'–'}),
+    el('td',{class:'n',text:fmt(e.cusX??e.cus)}),
+    el('td',{class:'sm',text:e.by.map(b=>offName(b[0])+' '+fmt(b[1])).join(', ')||'–'}))));
+  return el('div',{class:'tbl-wrap',style:'margin-top:6px'}, t);
+}
+function renderAna(){
+  const devs=scopeDevs(), evs=scopeEvents();
+  const offPart = id => { const xs=devOffs(id).filter(o=>offMatch(o[0])); return [0,0,xs.reduce((s,o)=>s+o[2],0),xs.reduce((s,o)=>s+o[3],0)]; };
+  const cus = devs.reduce((s,id)=>s+(state.off? offPart(id)[2] : devOffs(id).reduce((a,o)=>a+o[2],0)),0);
+  const cxt = devs.reduce((s,id)=>s+(state.off? offPart(id)[3] : devOffs(id).reduce((a,o)=>a+o[3],0)),0);
+  $('aCus').textContent=fmt(cus); $('aCusBar').style.width=Math.min(100,pct(cus,EVD.region.cus)*5)+'%';
+  $('aCusSub').textContent=pct(cus,EVD.region.cus).toFixed(1)+'% ของทั้ง กฟฉ.2 ('+fmtM(EVD.region.cus)+' ราย) · รวมทุก กฟส. ที่อุปกรณ์จ่ายไฟ';
+  $('aCxt').textContent=fmtM(cxt); $('aCxtBar').style.width=Math.min(100,pct(cxt,EVD.region.cxt)*5)+'%';
+  $('aCxtSub').textContent=pct(cxt,EVD.region.cxt).toFixed(1)+'% ของทั้ง กฟฉ.2 ('+fmtM(EVD.region.cxt)+')';
+  const tl=evs.filter(e=>e.st==='T/L').length;
+  $('aEv').replaceChildren(fmt(evs.length), el('small',{text:' ครั้ง'}));
+  $('aEvSub').textContent=devs.length+' อุปกรณ์ · Trip Lockout '+tl+' ครั้ง · Trip Reclose '+evs.filter(e=>/^T\/R|^TR/.test(e.st)).length+' ครั้ง';
+  const unk=evs.filter(e=>e.k==='ไม่พบสาเหตุ').length;
+  $('aUnk').textContent=(evs.length?pct(unk,evs.length).toFixed(0):0)+'%';
+  $('aUnkSub').textContent=unk+' จาก '+evs.length+' ครั้ง ต้อง Patrol หาจุดเสี่ยง';
+  // issues
+  const byC={}; evs.forEach(e=>{ const c=e.c||'ไม่ระบุ'; (byC[c]=byC[c]||{n:0,cus:0,devs:new Set()}); byC[c].n++; byC[c].cus+=e.cusX; byC[c].devs.add(e.dev); });
+  const totCus=evs.reduce((s,e)=>s+e.cusX,0)||1;
+  const ACT={'สัตว์':['ระยะกลาง','s-req','ติดตั้งอุปกรณ์ป้องกันสัตว์ (Snake guard / Animal guard) และของบป้องกัน'],
+    'อุปกรณ์':['ระยะยาว','s-work','ประมาณงานเปลี่ยนอุปกรณ์ที่เสื่อมสภาพ'],
+    'ต้นไม้':['ระยะสั้น','s-done','Patrol ตัดต้นไม้แนวสาย หรือของบจ้างเหมาตัดต้นไม้กรณีพิเศษ'],
+    'ภัยธรรมชาติ':['ระยะสั้น','s-done','Patrol หลังพายุ ตรวจกิ่งไม้ สายหย่อน และจุดต่อสาย'],
+    'วัสดุแปลกปลอม':['ระยะสั้น','s-done','Patrol เก็บวัสดุแปลกปลอมแนวสาย'],
+    'ไม่ใช่เหตุการณ์จริง':['ข้อมูล','s-none','ตรวจสอบการบันทึกเหตุการณ์ และขอยกเลิกรายการที่สร้างผิด']};
+  const iss=$('aIssues'); iss.replaceChildren();
+  Object.entries(byC).filter(([c])=>ACT[c]).sort((a,b)=>b[1].n-a[1].n).slice(0,3).forEach(([c,v])=>{
+    const a=ACT[c], dl=[...v.devs];
+    iss.append(el('div',{class:'issue'}, el('h3',{}, el('span',{class:'pill '+a[1],text:a[0]}), c+' '+v.n+' ครั้ง'),
+      el('p',{text:pct(v.n,evs.length).toFixed(0)+'% ของเหตุการณ์ · กระทบผู้ใช้ไฟ '+pct(v.cus,totCus).toFixed(0)+'% · '+a[2]}),
+      el('div',{class:'sm',text:dl.length+' อุปกรณ์: '+dl.slice(0,4).join(', ')+(dl.length>4?' และอีก '+(dl.length-4):'')})));
+  });
+  if(!iss.children.length) iss.append(el('div',{class:'empty',text:'ไม่มีเหตุการณ์ตามตัวกรอง'}));
+  // causes
+  const key=['n','cus','cxt'][aMode];
+  document.querySelectorAll('#aMode button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.m===aMode)));
+  const C={}; evs.forEach(e=>{ const c=e.c||'ไม่ระบุ'; C[c]=C[c]||{n:0,cus:0,cxt:0}; C[c].n++; C[c].cus+=e.cusX; C[c].cxt+=e.cxt; });
+  const tot=Object.values(C).reduce((s,v)=>s+v[key],0)||1;
+  const R=EVD.region.cause, rIdx=aMode, rTot=Object.values(R).reduce((s,v)=>s+v[rIdx],0)||1;
+  $('aCauseHint').textContent=evs.length+' ครั้งตามตัวกรอง · เส้นดำ = สัดส่วนทั้ง กฟฉ.2'+(aMode===2&&state.off?' · CusXTime เป็นของทั้งเหตุการณ์':'');
+  const ac=$('aCause'); ac.replaceChildren();
+  Object.entries(C).sort((a,b)=>b[1][key]-a[1][key]).forEach(([c,v])=>{
+    const p=pct(v[key],tot), rp=pct((R[c]||[0,0,0])[rIdx],rTot);
+    ac.append(el('div',{class:'cbar'}, el('span',{text:c}), el('div',{class:'tr'}, el('i',{style:`width:${p}%`}), el('b',{style:`left:${Math.min(99.5,rp)}%`,title:'ทั้ง กฟฉ.2 '+rp.toFixed(1)+'%'})),
+      el('span',{class:'v'}, p.toFixed(1)+'%', el('small',{text:fmt(v[key])+' · กฟฉ.2 '+rp.toFixed(1)+'%'}))));
+  });
+  // daily
+  const days=new Array(31).fill(0), hours=new Array(24).fill(0);
+  evs.forEach(e=>{ days[+e.t.slice(8,10)-1]++; hours[+e.t.slice(11,13)]++; });
+  const md=Math.max(1,...days), mh=Math.max(1,...hours);
+  $('aDaily').replaceChildren(...days.map((v,i)=>{ const wd=new Date(2026,9,i+1).getDay(); return el('i',{class:(wd===0||wd===6)?'we':'',style:`height:${v/md*100}%`,title:(i+1)+' ต.ค. · '+v+' ครั้ง'}); }));
+  $('aHour').replaceChildren(...hours.map((v,i)=>el('i',{style:`height:${v/mh*100}%`,title:String(i).padStart(2,'0')+':00 · '+v+' ครั้ง'})));
+  const topH=hours.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]).slice(0,3).filter(x=>x[0]).map(x=>String(x[1]).padStart(2,'0')+':00');
+  $('aEvBtn').textContent='แสดง / ซ่อน '+evs.length+' ครั้ง';
+  $('aHourHint').textContent=topH.length?'ชั่วโมงที่เกิดบ่อย '+topH.join(', ')+' น.':'';
+  const host=$('aEvTbl').closest('.tbl-wrap'); const nt=evTable([...evs].sort((a,b)=>a.t.localeCompare(b.t)), true); nt.querySelector('tbody').id='aEvTbl'; host.replaceWith(nt);
+}
+
+/* ---------- บันทึกการดำเนินงาน กฟส. ---------- */
+const OS={none:{t:'ยังไม่ดำเนินการ',c:'s-todo'},work:{t:'กำลังดำเนินการ',c:'s-work'},done:{t:'แล้วเสร็จ',c:'s-done'}};
+const OM={none:{t:'ยังไม่มีแผน',c:'s-none'},todo:{t:'มีแผน ยังไม่ดำเนินการ',c:'s-todo'},req:{t:'เสนอของบ / รออนุมัติ',c:'s-req'},appr:{t:'อนุมัติแล้ว',c:'s-req'},work:{t:'กำลังดำเนินการ',c:'s-work'},done:{t:'แล้วเสร็จ',c:'s-done'},na:{t:'ไม่จำเป็น',c:'s-na'}};
+let ofcDocs={};
+const okey=(dev,site)=>(dev+'__'+site).replace(/[^A-Za-z0-9_\-.~:@+]/g,'_');
+function ofcRows(){
+  return scopeDevs().sort((a,b)=>(T20.find(r=>r.id===a)?.no||99)-(T20.find(r=>r.id===b)?.no||99))
+    .map(id=>({id, offs:devOffs(id).filter(o=>o[2]>0 && offMatch(o[0])).sort((a,b)=>offNo(a[0])-offNo(b[0]))})).filter(x=>x.offs.length);
+}
+function renderOfc(){
+  const groups=ofcRows(), items=groups.flatMap(g=>g.offs.map(o=>({id:g.id,o,a:ofcDocs[okey(g.id,o[1])]})));
+  const n=items.length, sd=items.filter(x=>x.a?.s?.status==='done').length, mp=items.filter(x=>x.a?.m && !['none',undefined].includes(x.a.m.status)).length;
+  $('oN').replaceChildren(fmt(n), el('small',{text:' รายการ'})); $('oNSub').textContent=groups.length+' อุปกรณ์ · '+new Set(items.map(x=>x.o[0])).size+' กฟส. · รายงานแล้ว '+items.filter(x=>x.a).length;
+  $('oS').replaceChildren(fmt(sd), el('small',{text:' / '+n})); $('oSBar').style.width=pct(sd,n)+'%'; $('oSSub').textContent='กำลังดำเนินการ '+items.filter(x=>x.a?.s?.status==='work').length;
+  $('oM').replaceChildren(fmt(mp), el('small',{text:' / '+n})); $('oMBar').style.width=pct(mp,n)+'%'; $('oMSub').textContent='เสนอของบ '+items.filter(x=>['req','appr'].includes(x.a?.m?.status)).length+' · แล้วเสร็จ '+items.filter(x=>x.a?.m?.status==='done').length;
+  const bud=items.reduce((s,x)=>s+(+x.a?.m?.budget||0),0); $('oBud').replaceChildren(fmtM(bud), el('small',{text:' บาท'})); $('oBudSub').textContent='รวมทุก กฟส. ตามตัวกรอง';
+  const tb=$('oTbl'); tb.replaceChildren();
+  if(!groups.length){ tb.append(el('tr',{},el('td',{colspan:7,class:'empty',text:'ไม่มีอุปกรณ์ที่กระทบ กฟส. นี้ตามตัวกรอง'}))); return; }
+  groups.forEach(g=>{
+    const r=T20.find(x=>x.id===g.id), evs=EVD.devs[g.id].ev, top=Object.entries(evs.reduce((m,e)=>(m[e.sc||e.c||'ไม่ระบุ']=(m[e.sc||e.c||'ไม่ระบุ']||0)+1,m),{})).sort((a,b)=>b[1]-a[1]).slice(0,2);
+    tb.append(el('tr',{class:'grp'}, el('td',{colspan:7}, '#'+(r?.no||'')+' '+g.id+' · '+(DEV_G[g.id]||'')+' · ฟีดเดอร์ '+(DEV_F[g.id]||'')+' · '+evs.length+' ครั้ง · สาเหตุเด่น: '+top.map(t=>t[0]+' '+t[1]).join(', '))));
+    g.offs.forEach(o=>{ const a=ofcDocs[okey(g.id,o[1])], s=a?.s||{status:'none'}, m=a?.m||{status:'none'};
+      const late = m.due && m.due<today && !['done','na','none'].includes(m.status);
+      tb.append(el('tr',{},
+        el('td',{}, el('div',{style:'font-weight:600',text:offName(o[0])}), el('div',{class:'sm',text:'สังกัด '+(offGroup(o[0])||'–')+' · '+o[1]})),
+        el('td',{class:'n',text:fmt(o[2])}), el('td',{class:'n',text:fmt(o[3])}),
+        el('td',{class:'bl tcell'}, el('span',{class:'pill '+OS[s.status||'none'].c,text:OS[s.status||'none'].t}),
+          (s.f||s.x)? el('div',{class:'plan',text:'จุดเสี่ยงพบ '+(s.f||0)+' แก้แล้ว '+(s.x||0)}):null, s.detail? el('div',{class:'plan',text:s.detail}):null, s.date? el('div',{class:'plan',text:thDate(s.date)}):null),
+        el('td',{class:'tcell'}, el('span',{class:'pill '+(late?'s-late':OM[m.status||'none'].c),text:late?'เลยกำหนด':OM[m.status||'none'].t}),
+          m.plan? el('div',{class:'plan',text:m.plan}):null, m.budget? el('div',{class:'plan',text:'งบ '+fmt(m.budget)+' บาท'}):null, m.due? el('div',{class:'plan',text:'กำหนด '+thDate(m.due)}):null),
+        el('td',{class:'bl sm',text: a?.updatedAt? new Date(a.updatedAt).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'})+(a.by?' · '+a.by:'') : '–'}),
+        el('td',{}, writeBtn(a?'แก้ไข':'กรอกข้อมูล', ()=>openOfc(g.id,o), a?'ghost':''))));
+    });
+  });
+}
+const odlg=$('odlg'), oform=$('oform'); let ocur=null;
+function ofcItems(){
+  return Object.keys(EVD.devs).sort((a,b)=>(T20.find(r=>r.id===a)?.no||99)-(T20.find(r=>r.id===b)?.no||99))
+    .flatMap(id=>devOffs(id).filter(o=>o[2]>0).map(o=>({id,o})))
+    .filter(x=>(!state.typ||DEV_G[x.id]===state.typ) && offMatch(x.o[0]))
+    .sort((a,b)=>offNo(a.o[0])-offNo(b.o[0]));
+}
+function openOfcPicker(){
+  const items=ofcItems(); if(!items.length){ toast('ไม่มีรายการตามตัวกรอง'); return; }
+  openOfc(items[0].id, items[0].o);
+}
+$('oPick').onchange=e=>{ const [id,site]=e.target.value.split('|'); const o=devOffs(id).find(x=>x[1]===site); if(o) openOfc(id,o,true); };
+function openOfc(id,o,keep){
+  ocur={id,o};
+  const pk=$('oPick'); pk.replaceChildren();
+  let items=ofcItems(); if(!items.some(x=>x.id===id&&x.o[1]===o[1])) items=[{id,o},...items];
+  items.forEach(x=>{ const a=ofcDocs[okey(x.id,x.o[1])]; pk.append(el('option',{value:x.id+'|'+x.o[1],text:offName(x.o[0])+' · '+x.id+' · '+fmt(x.o[2])+' ราย'+(a?' · บันทึกแล้ว':'')})); });
+  pk.value=id+'|'+o[1]; const a=ofcDocs[okey(id,o[1])]||{}, s=a.s||{}, m=a.m||{};
+  $('oT').textContent='บันทึกการดำเนินงาน · '+offName(o[0]);
+  $('oSub').textContent=`ภายใต้อุปกรณ์ ${id} (${DEV_G[id]||''} ฟีดเดอร์ ${DEV_F[id]||''}) · ผู้ใช้ไฟได้รับผลกระทบในพื้นที่ ${fmt(o[2])} ราย · CusXTime ${fmt(o[3])}`;
+  $('osSt').value=s.status||'none'; $('osDate').value=s.date||''; $('osKm').value=s.km||''; $('osF').value=s.f||''; $('osX').value=s.x||''; $('osSap').value=s.sap||''; $('osDet').value=s.detail||'';
+  $('omPlan').value=m.plan||''; $('omSt').value=m.status||'none'; $('omBud').value=m.budget||''; $('omDue').value=m.due||''; $('omSap').value=m.sap||''; $('omDet').value=m.detail||'';
+  $('oBy').value=a.by||''; $('oMsg').textContent='';
+  if(!odlg.open) odlg.showModal();
+}
+$('oCancel').onclick=()=>odlg.close();
+$('bOfc').onclick=openOfcPicker;
+oform.addEventListener('submit', async e=>{
+  e.preventDefault(); const msg=$('oMsg'); msg.textContent='';
+  const f=Math.max(0,+$('osF').value||0), x=Math.max(0,+$('osX').value||0);
+  if(x>f){ msg.textContent='จุดที่แก้แล้วต้องไม่มากกว่าจุดที่พบ'; return; }
+  let sst=$('osSt').value; if(sst==='done' && f>x){ msg.textContent='ยังมีจุดค้าง '+(f-x)+' จุด เลือกสถานะ "กำลังดำเนินการ"'; return; }
+  let mst=$('omSt').value; const plan=$('omPlan').value.trim(); if(plan && mst==='none') mst='todo';
+  const prev=ofcDocs[okey(ocur.id,ocur.o[1])];
+  const body={device:ocur.id, office:ocur.o[0], site:ocur.o[1], month:'2569-10',
+    s:{status:sst, date:$('osDate').value || (sst==='done'?today:''), km:Math.max(0,+$('osKm').value||0), f, x, sap:$('osSap').value.trim(), detail:$('osDet').value.trim()},
+    m:{status:mst, plan, budget:Math.max(0,+$('omBud').value||0), due:$('omDue').value, sap:$('omSap').value.trim(), detail:$('omDet').value.trim()},
+    by:$('oBy').value.trim(), createdAt:prev?.createdAt||new Date().toISOString(), updatedAt:new Date().toISOString(), updatedBy:myId};
+  const btn=$('oSave'); btn.disabled=true;
+  try{ await db.collection('ofc').doc(okey(ocur.id,ocur.o[1])).set(body); odlg.close(); toast('บันทึกแล้ว'); }
+  catch(err){ if(err&&err.code==='invalid_argument'&&canWrite!==true){canWrite=false; render();} msg.textContent=errText(err); }
+  finally{ btn.disabled=false; }
+});
+
+/* ---------- ส่งออก Google Sheet (เฉพาะเจ้าของหน้า) ---------- */
+const SHEET_ID='1HWt7-RT4WV2cJ4RbpYo7eLApKaF1_BXT_ZCfqZEqc8s', SHEET_URL='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/edit';
+const TAB_S='สถานะติดตาม', TAB_P='รายงาน Patrol', TAB_O='รายงานราย กฟส.';
+const tx = v => (v==null||v==='') ? '' : "'"+String(v);
+const TREE_T={'':'ไม่ขอ',req:'เสนอขอ',appr:'อนุมัติแล้ว',done:'ดำเนินการแล้ว'};
+function sheetRows(stamp){
+  const H=['ลำดับ','OpDeviceID','กฟส.','Feeder','ครั้ง','นาที','ผู้ใช้ไฟ (ราย)','CusXTime (ราย·นาที)'];
+  TERMS.forEach(t=>H.push(t.t+': แผน',t.t+': สถานะ',t.t+': ดำเนินการแล้ว',t.t+': กำหนดเสร็จ',t.t+': เสร็จจริง',t.t+': งบ (บาท)'));
+  H.push('ตัดต้นไม้กรณีพิเศษ: สถานะ','ตัดต้นไม้กรณีพิเศษ: วงเงิน (บาท)','สถานะติดตาม','รายงาน Patrol (ครั้ง)','จุดเสี่ยงพบ','จุดเสี่ยงแก้แล้ว','จุดเสี่ยงค้าง','หมายเหตุ');
+  const rows=[H];
+  T20.forEach((r,i)=>{ const d=rec(r), rp=reportsOf(rid(r)), n=i+2;
+    const row=[r.no,r.id,offName(r.off),r.fdr,r.cnt,r.dur,r.cus,r.cxt];
+    TERMS.forEach(t=>{ const x=d[t.k]||{status:'none'}; row.push(tx(x.plan), S[x.status]?.t||'', x.status==='done', x.due||'', x.fin||'', +x.budget||0); });
+    row.push(TREE_T[d.tree?.status||''], +d.tree?.budget||0, OV[overall(r)].t, rp.length,
+      rp.reduce((s,p)=>s+rsum(p,'f'),0), rp.reduce((s,p)=>s+rsum(p,'x'),0), `=AE${n}-AF${n}`, tx(d.note));
+    rows.push(row); });
+  const tot=['รวม 20 รายการ','','','','','',`=SUM(G2:G21)`,`=SUM(H2:H21)`];
+  ['I','O','U'].forEach(c=>{ const col=k=>String.fromCharCode(c.charCodeAt(0)+k);
+    tot.push('', '', `=COUNTIF(${col(2)}2:${col(2)}21,TRUE)`, '', '', `=SUM(${col(5)}2:${col(5)}21)`); });
+  tot.push('', '=SUM(AB2:AB21)', '=COUNTIF(AC2:AC21,"ครบทุกระยะ")', '=SUM(AD2:AD21)', '=SUM(AE2:AE21)', '=SUM(AF2:AF21)', '=SUM(AG2:AG21)', '');
+  rows.push(tot);
+  const foot=new Array(H.length).fill(''); foot[0]="'ข้อมูลจาก Dashboard ติดตามแผน PM Top 20 กฟฉ.2 ณ "+stamp; rows.push(foot);
+  const PH=['วันที่แก้ไข','ลำดับ','OpDeviceID','กฟส.','หมายเลขเหตุการณ์','หมายเลขใบสั่ง','วันที่ไฟดับ','เวลา','สถานะอุปกรณ์','Phase Fault','กระแส Fault','สาเหตุที่พบ','ระยะทาง Patrol (วงจร-กม.)','ช่วงที่ตรวจ','ชุดปฏิบัติงาน','จุดเสี่ยงพบ','จุดเสี่ยงแก้แล้ว','จุดเสี่ยงค้าง','จุดเสี่ยงแยกประเภท (พบ/แก้)','รายละเอียดการแก้ไข','ผลการแก้ไข','เลขที่ SAP','ผู้รายงาน','รูปประกอบ (รูป)','บันทึกเมื่อ'];
+  const prow=[PH];
+  [...reports].sort((a,b)=>(a.fixDate||'').localeCompare(b.fixDate||'')||(a.no-b.no)).forEach((p,i)=>{ const e=p.ev||{}, n=i+2;
+    prow.push([p.fixDate||'', p.no, p.device, offName(p.office||''), tx(e.event), tx(e.order), e.date||'', tx(e.time), tx(e.status), tx(e.phase), tx(e.current),
+      tx(p.cause), +p.km||0, tx(p.span), tx(p.crew), rsum(p,'f'), rsum(p,'x'), `=P${n}-Q${n}`,
+      tx(RISKS.filter(k=>p.risks?.[k.k]).map(k=>`${k.t} ${p.risks[k.k].f||0}/${p.risks[k.k].x||0}`).join(', ')),
+      tx(p.result), (OUT[p.outcome]||OUT.part).t, tx(p.sap), tx(p.by), (p.photos||[]).length,
+      tx(p.updatedAt? new Date(p.updatedAt).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'}):'')]); });
+  const OH=['ลำดับ','OpDeviceID','ประเภท','Feeder','กฟส.','รหัสพื้นที่','ผู้ใช้ไฟได้รับผลกระทบ (ราย)','CusXTime (ราย·นาที)','ระยะสั้น: สถานะ','ระยะสั้น: วันที่ดำเนินการ','ระยะสั้น: ระยะทาง (วงจร-กม.)','ระยะสั้น: จุดเสี่ยงพบ','ระยะสั้น: แก้แล้ว','ระยะสั้น: ค้าง','ระยะสั้น: รายละเอียด','ระยะสั้น: SAP','ระยะกลาง: แผนงาน','ระยะกลาง: สถานะ','ระยะกลาง: งบ (บาท)','ระยะกลาง: กำหนดเสร็จ','ระยะกลาง: รายละเอียด','ระยะกลาง: SAP / WBS','ผู้รายงาน','อัปเดตล่าสุด'];
+  const orow=[OH]; let n=1;
+  Object.keys(EVD.devs).sort((a,b)=>(T20.find(r=>r.id===a)?.no||99)-(T20.find(r=>r.id===b)?.no||99)).forEach(id=>{
+    devOffs(id).filter(o=>o[2]>0).forEach(o=>{ n++; const a=ofcDocs[okey(id,o[1])]||{}, sv=a.s||{status:'none'}, m=a.m||{status:'none'};
+      orow.push([T20.find(r=>r.id===id)?.no||'', id, DEV_G[id]||'', DEV_F[id]||'', offName(o[0]), o[1], o[2], o[3], OS[sv.status||'none'].t, sv.date||'', +sv.km||0, +sv.f||0, +sv.x||0, `=L${n}-M${n}`, tx(sv.detail), tx(sv.sap),
+        tx(m.plan), OM[m.status||'none'].t, +m.budget||0, m.due||'', tx(m.detail), tx(m.sap), tx(a.by), tx(a.updatedAt? new Date(a.updatedAt).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'}):'')]); });
+  });
+  return {status:rows, patrol:prow, ofc:orow};
+}
+let mcp=null, isOwner=false, sheetMeta=null;
+const TAB_M='การดำเนินงานบำรุงรักษา';
+function maintRows(stamp){
+  const H=['ลำดับ','OpDeviceID','ประเภท','Feeder','กฟฟ.','ผู้ใช้ไฟได้รับผลกระทบ (ราย)','CusXTime (ราย·นาที)','ครั้ง (ทั้งอุปกรณ์)','สาเหตุหลัก',
+    'ระยะสั้น: สถานะ','ระยะสั้น: ดำเนินการแล้ว','ระยะสั้น: วันที่','ระยะสั้น: จุดเสี่ยงพบ','ระยะสั้น: แก้แล้ว','ระยะสั้น: ค้าง','ระยะสั้น: รายละเอียด',
+    'ระยะกลาง: แผนงาน','ระยะกลาง: สถานะ','ระยะกลาง: ดำเนินการแล้ว','ระยะกลาง: งบ (บาท)','ระยะกลาง: กำหนดเสร็จ','ระยะกลาง: รายละเอียด',
+    'ระยะยาว: แผนงาน','ระยะยาว: สถานะ','ระยะยาว: ดำเนินการแล้ว','ระยะยาว: งบ (บาท)','รายงาน Patrol (ครั้ง)','ผู้รายงาน','อัปเดตล่าสุด','สังกัด กฟฟ.','ลำดับ กฟฟ.','ชื่อย่อ กฟฟ.'];
+  const out=[["'การดำเนินงานบำรุงรักษาเชิงป้องกัน Top 20 อุปกรณ์ที่กระทบ SAIFI/SAIDI กฟฉ.2 · ตุลาคม 2569 · ข้อมูลจาก Dashboard ณ "+stamp], H];
+  const first=3; let n=first-1;
+  Object.keys(EVD.devs).sort((a,b)=>(T20.find(r=>r.id===a)?.no||99)-(T20.find(r=>r.id===b)?.no||99)).forEach(id=>{
+    const evs=EVD.devs[id].ev, topC=Object.entries(evs.reduce((m,e)=>(m[e.sc||e.c||'ไม่ระบุ']=(m[e.sc||e.c||'ไม่ระบุ']||0)+1,m),{})).sort((a,b)=>b[1]-a[1]).slice(0,2).map(x=>x[0]+' '+x[1]).join(', ');
+    [...devOffs(id).filter(o=>o[2]>0)].sort((a,b)=>offNo(a[0])-offNo(b[0])).forEach(o=>{ n++;
+      const row=T20.find(r=>r.id===id && norm(r.off)===norm(o[0])), tr=row? rec(row) : null, a=ofcDocs[okey(id,o[1])];
+      const sSt = a?.s ? a.s.status : (tr? ({done:'done',work:'work',req:'work'})[tr.s.status]||'none' : 'none');
+      const sv = a?.s || {};
+      const m = a?.m && a.m.status!=='none' ? a.m : (tr && tr.m.status!=='none' ? {plan:tr.m.plan,status:tr.m.status,budget:tr.m.budget,due:tr.m.due,detail:tr.m.result} : (a?.m||{status:'none'}));
+      const l = tr? tr.l : {status:'none'};
+      const rp = row? reportsOf(rid(row)) : [];
+      const f = (+sv.f||0) + rp.reduce((x,p)=>x+rsum(p,'f'),0), x = (+sv.x||0) + rp.reduce((y,p)=>y+rsum(p,'x'),0);
+      const upd=[a?.updatedAt, ...(rp.map(p=>p.updatedAt)), tr?.updatedAt].filter(Boolean).sort().pop();
+      out.push([row?.no||T20.find(r=>r.id===id)?.no||'', id, DEV_G[id]||'', DEV_F[id]||'', offName(o[0]), o[2], o[3], evs.length, tx(topC),
+        OS[sSt].t, sSt==='done', sv.date||(tr?.s?.fin||''), f, x, `=M${n}-N${n}`, tx(sv.detail || (tr?.s?.result||'')),
+        tx(m.plan), (OM[m.status]||OM.none).t, m.status==='done', +m.budget||0, m.due||'', tx(m.detail),
+        tx(l.plan), (S[l.status]||S.none).t, l.status==='done', +l.budget||0, rp.length, tx(a?.by||tr?.by||''),
+        tx(upd? new Date(upd).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'}) : ''), offGroup(o[0]), orgOf(o[0])?.no||'', tx(orgOf(o[0])?.abbr||'')]);
+    });
+  });
+  const last=n;
+  out.push(['รวม','','','','',`=SUM(F${first}:F${last})`,`=SUM(G${first}:G${last})`,'','','',`=COUNTIF(K${first}:K${last},TRUE)`,'',`=SUM(M${first}:M${last})`,`=SUM(N${first}:N${last})`,`=SUM(O${first}:O${last})`,'','','',`=COUNTIF(S${first}:S${last},TRUE)`,`=SUM(T${first}:T${last})`,'','','','',`=COUNTIF(Y${first}:Y${last},TRUE)`,`=SUM(Z${first}:Z${last})`,`=SUM(AA${first}:AA${last})`,'','']);
+  // Patrol reports block
+  out.push([]); out.push(["'รายงานผล Patrol ระยะสั้น (จาก OUTAGE_NE2 / PM all)"]);
+  const P=sheetRows(stamp).patrol; P.forEach(r=>out.push(r.map(v=>typeof v==='string'&&v.startsWith('=')?'':v)));
+  return {rows:out, nOfc:last-first+1, nPat:P.length-1};
+}
+async function exportSheet(){
+  const btn=$('bSheet'), st=$('sheetTxt'); btn.disabled=true; st.textContent='กำลังบันทึกลง Google Sheet…';
+  const stamp=new Date().toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'});
+  const {rows,nOfc,nPat}=maintRows(stamp);
+  try{
+    await sheetWrite(rows);
+    st.textContent='บันทึกแล้ว '+stamp+' · '+nOfc+' รายการ กฟส. · '+nPat+' รายงาน Patrol';
+    try{ await db.doc('config/sheet').set({lastExport:new Date().toISOString(), reports:nPat, by:myId}); }catch(e){}
+  }catch(err){
+    const c=err&&err.code;
+    st.textContent = c==='no_webapp'?'ยังไม่ได้ใส่ URL ของ Google Apps Script ในช่องด้านซ้าย'
+      : c==='remote'||c==='remote_net'?'Google Sheet ไม่ตอบรับ ตรวจสอบ URL และการ Deploy ของ Apps Script ('+String(err.message||'').slice(0,80)+')'
+      : c==='needs_reauth'?'ต้องเชื่อม Google Sheets ใหม่ใน claude.ai Settings → Connectors'
+      : c==='server_not_connected'?'ยังไม่ได้เชื่อม Google Sheets ในบัญชีนี้ เพิ่มได้ที่ claude.ai Settings → Connectors'
+      : c==='approval_required'||c==='not_in_manifest'?'ต้องอนุญาตให้หน้านี้ใช้ Google Sheets ก่อน กดบันทึกอีกครั้งแล้วเลือกอนุญาต'
+      : c==='tool_error'?'Google Sheet ปฏิเสธการเขียน ตรวจสอบว่าแท็บ "'+TAB_M+'" ยังอยู่และชื่อตรงกัน'
+      : 'บันทึกไม่สำเร็จ ข้อมูลบางส่วนอาจเขียนไปแล้ว เปิด Sheet ตรวจสอบแล้วกดอีกครั้ง';
+  }finally{ btn.disabled=false; }
+}
+$('bSheet').onclick=exportSheet;
+
+/* ---------- โหมดไฟล์ HTML: เก็บในเครื่อง + Google Sheet ผ่าน Apps Script ---------- */
+const WEBAPP_DEFAULT = '';
+let fileMode=false;
+const webUrl = () => { try{ return localStorage.getItem('pm20webapp') || WEBAPP_DEFAULT; }catch(e){ return WEBAPP_DEFAULT; } };
+function makeFileDb(){
+  const KEY='pm20db'; let store={}; try{ store=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){}
+  const subs={};
+  const save=()=>{ try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} };
+  const snapOf=col=>{ const docs=Object.entries(store[col]||{}).map(([id,data])=>({id,exists:true,data:()=>data})); return {docs,size:docs.length,empty:!docs.length,metadata:{fromCache:false,hasPendingWrites:false}}; };
+  const emit=col=>(subs[col]||[]).forEach(f=>f(snapOf(col)));
+  async function remote(body){
+    const u=webUrl(); if(!u) return null;
+    let j; try{ const r=await fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}); j=await r.json(); }
+    catch(e){ throw {code:'remote_net',message:String(e)}; }
+    if(!j||!j.ok) throw {code:'remote',message:(j&&j.error)||'error'};
+    return j;
+  }
+  async function pull(){
+    const u=webUrl(); if(!u) return false;
+    const r=await fetch(u+(u.includes('?')?'&':'?')+'action=list'); const j=await r.json();
+    if(!j.ok) throw new Error(j.error||'list failed');
+    const ns={}; (j.docs||[]).forEach(d=>{ (ns[d.col]=ns[d.col]||{})[d.id]=d.data; }); store=ns; save();
+    Object.keys(subs).forEach(emit); return true;
+  }
+  const rid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+  const docRef=(col,id)=>({ id, path:col+'/'+id,
+    get: async()=>({id,exists:!!store[col]?.[id],data:()=>store[col]?.[id]}),
+    set: async data=>{ await remote({action:'set',col,id,data}); (store[col]=store[col]||{})[id]=data; save(); emit(col); },
+    update: async data=>{ const d={...(store[col]?.[id]||{}),...data}; await remote({action:'set',col,id,data:d}); (store[col]=store[col]||{})[id]=d; save(); emit(col); },
+    delete: async()=>{ await remote({action:'delete',col,id}); if(store[col]) delete store[col][id]; save(); emit(col); },
+    onSnapshot: next=>{ const f=()=>next({id,exists:!!store[col]?.[id],data:()=>store[col]?.[id],metadata:{fromCache:false}}); (subs[col]=subs[col]||[]).push(f); setTimeout(f,0); return ()=>{}; } });
+  return { pull, remote,
+    doc: path=>{ const p=path.split('/'); return docRef(p.slice(0,-1).join('/'), p[p.length-1]); },
+    collection: col=>({ path:col, doc: id=>docRef(col,id||rid()), add: async data=>{ const r=docRef(col,rid()); await r.set(data); return r; },
+      onSnapshot: next=>{ (subs[col]=subs[col]||[]).push(next); setTimeout(()=>next(snapOf(col)),0); return ()=>{}; } }) };
+}
+async function sheetWrite(rows){
+  if(mcp){
+    await mcp.callTool('Google Sheets','batch_clear_values',{spreadsheetId:SHEET_ID, ranges:[`'${TAB_M}'!A1:AF1000`]});
+    await mcp.callTool('Google Sheets','update_values',{spreadsheetId:SHEET_ID, range:`'${TAB_M}'!A1`, values:rows});
+  } else {
+    if(!webUrl()) throw {code:'no_webapp'};
+    await db.remote({action:'writeTab', tab:TAB_M, rows});
+  }
+}
+
+/* live data */
+const dot=$('syncDot'), syncTxt=$('syncTxt');
+render();
+function subscribe(){
+  let loaded=false;
+  const timer=setTimeout(()=>{ if(!loaded){ dot.className='dot err'; syncTxt.textContent='ยังเชื่อมต่อฐานข้อมูลไม่ได้ สถานะอาจไม่เป็นปัจจุบัน'; } },10000);
+  db.collection('track').onSnapshot(snap=>{
+    docs={}; snap.docs.forEach(d=>{ docs[d.id]=d.data(); });
+    if(!snap.metadata.fromCache){ loaded=true; clearTimeout(timer);
+      if(!fileMode){ dot.className='dot ok'; syncTxt.textContent=(canWrite===false?'ดูได้อย่างเดียว · ':'')+'อัปเดตสด · '+new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}); } }
+    render();
+  }, err=>{ clearTimeout(timer); dot.className='dot err'; syncTxt.textContent='โหลดสถานะไม่สำเร็จ ('+(err&&err.code||'error')+')'; });
+  db.collection('ofc').onSnapshot(snap=>{ ofcDocs={}; snap.docs.forEach(d=>{ ofcDocs[d.id]=d.data(); }); render(); },
+    err=>{ syncTxt.textContent='โหลดบันทึก กฟส. ไม่สำเร็จ ('+(err&&err.code||'error')+')'; });
+  db.collection('patrol').onSnapshot(snap=>{ reports=snap.docs.map(d=>({id:d.id,...d.data()})); render(); },
+    err=>{ syncTxt.textContent='โหลดรายงาน Patrol ไม่สำเร็จ ('+(err&&err.code||'error')+')'; });
+  db.doc('config/sheet').onSnapshot(s=>{ const m=s.exists?s.data():null; if(m&&m.lastExport && !$('bSheet').disabled) $('sheetTxt').textContent='บันทึกลง Sheet ล่าสุด '+new Date(m.lastExport).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'}); }, ()=>{});
+}
+async function fileSync(){
+  if(!webUrl()){ dot.className='dot'; syncTxt.textContent='โหมดไฟล์ HTML · บันทึกในเครื่องนี้เท่านั้น (ยังไม่เชื่อม Google Sheet)'; return; }
+  try{ await db.pull(); dot.className='dot ok'; syncTxt.textContent='โหมดไฟล์ HTML · เชื่อม Google Sheet · อัปเดต '+new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}); }
+  catch(e){ dot.className='dot err'; syncTxt.textContent='โหมดไฟล์ HTML · ดึงข้อมูลจาก Google Sheet ไม่สำเร็จ ตรวจสอบ URL ของ Apps Script'; }
+}
+function startFileMode(){
+  fileMode=true; db=makeFileDb(); canWrite=null;
+  $('sheetBar').hidden=false; $('webBox').hidden=false; $('webUrl').value=webUrl();
+  subscribe(); render(); fileSync();
+  setInterval(()=>{ if(!document.hidden) fileSync(); }, 60000);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) fileSync(); });
+}
+$('webSave').onclick=()=>{ const v=$('webUrl').value.trim();
+  if(v && !/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec/.test(v)){ $('sheetTxt').textContent='URL ต้องขึ้นต้นด้วย https://script.google.com/macros/s/.../exec'; return; }
+  try{ v? localStorage.setItem('pm20webapp',v) : localStorage.removeItem('pm20webapp'); }catch(e){}
+  $('sheetTxt').textContent = v?'บันทึก URL แล้ว กำลังดึงข้อมูล…':'ยกเลิกการเชื่อม Google Sheet แล้ว'; fileSync(); };
+(async()=>{
+  const c=window.claude;
+  if(!c||!c.use){ startFileMode(); return; }
+  [db,user]=await Promise.all([c.use('db'),c.use('user')]);
+  if(!db){ dot.className='dot err'; syncTxt.textContent='แสดงสถานะตามไฟล์ เข้าสู่ระบบเพื่ออัปเดต'; render(); return; }
+  if(user){ myId=await user.id(); canWrite=await user.can('data.write'); }
+  render(); subscribe();
+  c.use('assets').then(a=>{ assets=a; }).catch(()=>{});
+  isOwner = user ? await user.isOwner() : false;
+  if(isOwner){ mcp = await c.use('mcp'); if(mcp) $('sheetBar').hidden=false; }
+})();
+</script>
